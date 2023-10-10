@@ -5,7 +5,7 @@ import * as link from './link';
 import * as asset from './asset';
 
 export const versionDescription: INodeTypeDescription = {
-	displayName: 'SeaTable NG',
+	displayName: 'SeaTable',
 	name: 'seaTable',
 	icon: 'file:seatable.svg',
 	group: ['output'],

@@ -1,7 +1,7 @@
 import type { INodeTypeBaseDescription, IVersionedNodeType } from 'n8n-workflow';
 import { VersionedNodeType } from 'n8n-workflow';
 
-//import { SeaTableV1 } from './v1/SeaTableV1.node';
+import { SeaTableV1 } from './v1/SeaTableV1.node';
 import { SeaTableV2 } from './v2/SeaTableV2.node';
 
 export class SeaTable extends VersionedNodeType {
@@ -17,7 +17,7 @@ export class SeaTable extends VersionedNodeType {
 		};
 
 		const nodeVersions: IVersionedNodeType['nodeVersions'] = {
-			//1: new SeaTableV1(baseDescription),
+			1: new SeaTableV1(),
 			2: new SeaTableV2(baseDescription),
 		};
 
