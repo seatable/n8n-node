@@ -36,7 +36,7 @@ export const rowSearchDescription: RowProperties = [
 		},
 		required: true,
 		default: '',
-		description: 'Select the column to be searched.',
+		description: 'Select the column to be searched. Not all column types are supported for search.',
 	},
 	{
 		displayName: 'Search term',

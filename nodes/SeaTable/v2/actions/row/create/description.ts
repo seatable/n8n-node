@@ -106,4 +106,16 @@ export const rowCreateDescription: RowProperties = [
 		default: {},
 		description: 'Add destination column with its value',
 	},
+	{
+		displayName: 'Hint: Link, files, images or digital signatures have to be added separately.',
+		name: 'notice',
+		type: 'notice',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['row'],
+				operation: ['create'],
+			},
+		},
+	},
 ];

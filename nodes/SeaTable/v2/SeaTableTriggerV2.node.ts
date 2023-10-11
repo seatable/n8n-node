@@ -41,26 +41,20 @@ export class SeaTableTriggerV2 implements INodeType {
 		const webhookData = this.getWorkflowStaticData('node');
 		const event = this.getNodeParameter('event') as string;
 		const tableName = this.getNodeParameter('tableName') as string;
-		let viewName: string = '';
-		let assetColumn: string = '';
-		if (event == 'newRow' || event == 'updatedRow') {
-			viewName = this.getNodeParameter('viewName') as string;
-		} else {
-			assetColumn = this.getNodeParameter('assetColumn') as string;
-		}
+		const viewName = (event != 'newAsset' ? this.getNodeParameter('viewName') : '') as string;
+		const assetColumn = (event == 'newAsset' ? this.getNodeParameter('assetColumn') : '') as string;
 		const simple = this.getNodeParameter('simple') as boolean;
 
 		const ctx: ICtx = {};
-		//const credentials = await this.getCredentials('seaTableApi');
 
-		//const timezone = (credentials.timezone as string) || 'Europe/Berlin';
 		const startDate =
 			this.getMode() === 'manual'
 				? moment().utc().subtract(1, 'h').format()
 				: (webhookData.lastTimeChecked as string);
 		const endDate = (webhookData.lastTimeChecked = moment().utc().format());
 
-		const filterField = event === 'newRow' ? '_ctime' : '_mtime'; // this is working, even if the columns _mtime and _ctime have other names. Only relevant for newRow / updatedRow.
+		// this is working, even if the columns _mtime and _ctime have other names. Only relevant for newRow / updatedRow.
+		const filterField = event === 'newRow' ? '_ctime' : '_mtime';
 
 		// Difference between getRows and SqlQuery:
 		// ====================
@@ -96,7 +90,7 @@ export class SeaTableTriggerV2 implements INodeType {
 			const columnType = metadata.find((obj) => obj.name == assetColumn);
 			const assetColumnType = columnType?.type || null;
 
-			// remove unwanted entries (does not work)
+			// remove unwanted entries
 			rows = sqlResult.results.filter(
 				(obj) => new Date(obj['_mtime']) > new Date(startDate),
 			) as IRow[];
@@ -112,59 +106,6 @@ export class SeaTableTriggerV2 implements INodeType {
 						}
 					}
 				}
-				/*if (assetColumnType === 'image') {
-					let pictures = (row[assetColumn] as string[]) || [];
-					if (pictures.length > 0) {
-						pictures.forEach((element) => {
-							const fileName = element.split('/').pop();
-							const newItem = {
-								id: `${row._id}-${fileName}`,
-								type: assetColumnType,
-								name: fileName,
-								size: 0,
-								url: element,
-								public_url: '...',
-								metadata: {
-									row_id: `${row._id}`,
-									row_ctime: `${row._ctime}`,
-									row_mtime: `${row._mtime}`,
-									table_name: `${tableName}`,
-									column_name: `${columnType?.name}`,
-								},
-							};
-							newRows.push(newItem);
-						});
-					}
-					rows = newRows;
-					console.log('neue rows');
-					console.log(rows);
-				} else if (assetColumnType === 'file') {
-					let files = (row[assetColumn] as object[]) || [];
-					if (files.length > 0) {
-						files.forEach((element) => {
-							const fileName = `${element?.name}`;
-							const newItem = {
-								id: `${row._id}-${fileName}`,
-								type: assetColumnType,
-								name: fileName,
-								size: `${element?.size}`,
-								url: `${element?.url}`,
-								public_url: '...',
-								metadata: {
-									row_id: `${row._id}`,
-									row_ctime: `${row._ctime}`,
-									row_mtime: `${row._mtime}`,
-									table_name: `${tableName}`,
-									column_name: `${columnType?.name}`,
-								},
-							};
-							newRows.push(newItem);
-						});
-					}
-					rows = newRows;
-					console.log('neue rows');
-					console.log(rows);
-				}*/
 			}
 		}
 
@@ -226,20 +167,20 @@ export class SeaTableTriggerV2 implements INodeType {
 		);
 		let collaborators: ICollaborator[] = collaboratorsResult.user_list || [];
 
-		if (!Array.isArray(rows) || !rows.length) {
-			return null;
+		if (Array.isArray(rows) && !rows.length) {
+			// remove columns starting with _ if simple;
+			if (simple) {
+				rows = rows.map((row) => simplify_new(row));
+			}
+
+			// enrich column types like {collaborator, creator, last_modifier}, {image, file}
+			// remove button column from rows
+			rows = rows.map((row) => enrichColumns(row, metadata, collaborators));
+
+			// prepare for final output
+			return [this.helpers.returnJsonArray(rows)];
 		}
 
-		// remove columns starting with _ if simple;
-		if (simple) {
-			rows = rows.map((row) => simplify_new(row));
-		}
-
-		// enrich column types like {collaborator, creator, last_modifier}, {image, file}
-		// hide columns like button
-		rows = rows.map((row) => enrichColumns(row, metadata, collaborators));
-
-		// prepare for final output
-		return [this.helpers.returnJsonArray(rows)];
+		return null;
 	}
 }

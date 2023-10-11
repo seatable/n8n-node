@@ -16,8 +16,6 @@ import type {
 } from './actions/Interfaces';
 import type { ICredentialDataDecryptedObject } from 'n8n-workflow';
 
-export type TInheritColumnTypeTime = 'ctime' | 'mtime';
-export type TInheritColumnTypeUser = 'creator' | 'last-modifier';
 export type TColumnType =
 	| 'text'
 	| 'long-text'
@@ -27,27 +25,34 @@ export type TColumnType =
 	| 'duration'
 	| 'single-select'
 	| 'multiple-select'
-	| 'email'
-	| 'url'
-	| 'rate'
-	| 'checkbox'
-	| 'formula'
-	| 'button'
 	| 'image'
 	| 'file'
-	| 'digital-sign'
-	| TInheritColumnTypeTime
-	| TInheritColumnTypeUser
-	| 'auto-number';
+	| 'email'
+	| 'url'
+	| 'checkbox'
+	| 'rate'
+	| 'formula'
+	| 'link-formula'
+	| 'geolocation'
+	| 'link'
+	| 'creator'
+	| 'ctime'
+	| 'last-modifier'
+	| 'mtime'
+	| 'auto-number'
+	| 'button'
+	| 'digital-sign';
 
-type TImplementInheritColumnKey = '_seq';
 export type TInheritColumnKey =
 	| '_id'
 	| '_creator'
 	| '_ctime'
 	| '_last_modifier'
 	| '_mtime'
-	| TImplementInheritColumnKey;
+	| '_seq'
+	| '_archived'
+	| '_locked'
+	| '_locked_by';
 
 export type TColumnValue = undefined | boolean | number | string | string[] | null;
 export type TColumnKey = TInheritColumnKey | string;

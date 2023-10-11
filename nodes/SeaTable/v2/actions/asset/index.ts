@@ -19,14 +19,14 @@ export const descriptions: INodeProperties[] = [
 			{
 				name: 'Public URL',
 				value: 'getPublicURL',
-				description: 'get public URL from asset path',
-				action: 'Get public URL from asset path',
+				description: 'Get the public URL from asset path',
+				action: 'Get the public URL from asset path',
 			},
 			{
 				name: 'Upload',
 				value: 'upload',
 				description: 'Add a file/image to an existing row',
-				action: 'Upload file/image',
+				action: 'Upload a file/image',
 			},
 		],
 		default: 'upload',

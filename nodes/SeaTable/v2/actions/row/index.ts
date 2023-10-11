@@ -30,19 +30,19 @@ export const descriptions: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				description: 'Get a row',
+				description: 'Get the content of a row',
 				action: 'Get a row',
 			},
 			{
 				name: 'Search',
 				value: 'search',
 				description: 'Search one or multiple rows',
-				action: 'Search row by keyword',
+				action: 'Search a row by keyword',
 			},
 			{
 				name: 'Update',
 				value: 'update',
-				description: 'Update a row',
+				description: 'Update the content of a row',
 				action: 'Update a row',
 			},
 			{
@@ -55,13 +55,13 @@ export const descriptions: INodeProperties[] = [
 				name: 'Lock',
 				value: 'lock',
 				description: 'Lock a row to prevent further changes.',
-				action: 'Add row lock',
+				action: 'Add a row lock',
 			},
 			{
 				name: 'Unlock',
 				value: 'unlock',
 				description: 'Remove the lock from a row',
-				action: 'Remove row lock',
+				action: 'Remove a row lock',
 			},
 		],
 		default: 'create',

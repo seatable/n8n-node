@@ -5,8 +5,9 @@ import {
 	split,
 	rowExport,
 	updateAble,
+	splitStringColumnsToArrays,
 } from '../../../GenericFunctions';
-import { IRowObject } from '../../Interfaces';
+import type { IRowObject } from '../../Interfaces';
 import type { TColumnsUiValues, TColumnValue } from '../../../types';
 
 export async function update(
@@ -20,29 +21,35 @@ export async function update(
 		| 'autoMapInputData';
 	const rowId = this.getNodeParameter('rowId', index) as string;
 
-	const body = {} as IDataObject;
-	const rowInput = {} as IRowObject;
+	const body = {
+		table_name: tableName,
+		row_id: rowId,
+	} as IDataObject;
+	let rowInput = {} as IRowObject;
 
-	const items = this.getInputData();
-	for (let ii = 0; ii < items.length; ii++) {
-		if (fieldsToSend === 'autoMapInputData') {
-			const incomingKeys = Object.keys(items[ii].json);
-			const inputDataToIgnore = split(this.getNodeParameter('inputsToIgnore', ii, '') as string);
-			for (const key of incomingKeys) {
-				if (inputDataToIgnore.includes(key)) continue;
-				rowInput[key] = items[ii].json[key] as TColumnValue;
-			}
-		} else {
-			const columns = this.getNodeParameter('columnsUi.columnValues', ii, []) as TColumnsUiValues;
-			for (const column of columns) {
-				rowInput[column.columnName] = column.columnValue;
-			}
+	// get rowInput, an object of key:value pairs like { Name: 'Promo Action 1', Status: "Draft" }.
+	if (fieldsToSend === 'autoMapInputData') {
+		const items = this.getInputData();
+		const incomingKeys = Object.keys(items[index].json);
+		const inputDataToIgnore = split(this.getNodeParameter('inputsToIgnore', index, '') as string);
+		for (const key of incomingKeys) {
+			if (inputDataToIgnore.includes(key)) continue;
+			rowInput[key] = items[index].json[key] as TColumnValue;
+		}
+	} else {
+		const columns = this.getNodeParameter('columnsUi.columnValues', index, []) as TColumnsUiValues;
+		for (const column of columns) {
+			rowInput[column.columnName] = column.columnValue;
 		}
 	}
 
-	body.row = rowExport(rowInput, updateAble(tableColumns));
-	body.table_name = tableName;
-	body.row_id = rowId;
+	// only keep key:value pairs for columns that are allowed to update.
+	rowInput = rowExport(rowInput, updateAble(tableColumns));
+
+	// string to array: multi-select and collaborators
+	rowInput = splitStringColumnsToArrays(rowInput, tableColumns);
+
+	body.row = rowInput;
 
 	const responseData = await seaTableApiRequest.call(
 		this,

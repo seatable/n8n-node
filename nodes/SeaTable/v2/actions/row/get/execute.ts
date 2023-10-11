@@ -1,37 +1,23 @@
 import type { IExecuteFunctions, IDataObject, INodeExecutionData } from 'n8n-workflow';
-import type {
-	IRow,
-	IRowResponse,
-	IDtableMetadataColumn,
-	ICollaborator,
-	ICollaboratorsResult,
-} from './../../Interfaces';
-import { seaTableApiRequest, enrichColumns, simplify_new } from '../../../GenericFunctions';
+import type { IRow, IRowResponse, IDtableMetadataColumn } from './../../Interfaces';
+import {
+	seaTableApiRequest,
+	enrichColumns,
+	simplify_new,
+	getBaseCollaborators,
+} from '../../../GenericFunctions';
 
 export async function get(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
+	// get parameters
 	const tableName = this.getNodeParameter('tableName', index) as string;
 	const rowId = this.getNodeParameter('rowId', index) as string;
 	const simple = this.getNodeParameter('simple', index) as boolean;
 
-	/*console.log('execute get');
-	console.log(collaborators);
-	collaborators.map((coll) => console.log(coll));*/
+	// get collaborators
+	const collaborators = await getBaseCollaborators.call(this);
 
-	let sqlResult: IRowResponse;
-	let metadata: IDtableMetadataColumn[] = [];
-	let rows: IRow[];
-
-	// get the collaborators (avoid executing this multiple times !!!!)
-	let collaboratorsResult: ICollaboratorsResult = await seaTableApiRequest.call(
-		this,
-		{},
-		'GET',
-		'/dtable-server/api/v1/dtables/{{dtable_uuid}}/related-users/',
-	);
-	let collaborators: ICollaborator[] = collaboratorsResult.user_list || [];
-	console.log('COLLABORATORS-GET: ' + collaborators);
-
-	sqlResult = await seaTableApiRequest.call(
+	// get rows
+	let sqlResult = (await seaTableApiRequest.call(
 		this,
 		{},
 		'POST',
@@ -40,9 +26,9 @@ export async function get(this: IExecuteFunctions, index: number): Promise<INode
 			sql: `SELECT * FROM \`${tableName}\` WHERE _id = '${rowId}'`,
 			convert_keys: true,
 		},
-	);
-	metadata = sqlResult.metadata as IDtableMetadataColumn[];
-	rows = sqlResult.results as IRow[];
+	)) as IRowResponse;
+	let metadata = sqlResult.metadata as IDtableMetadataColumn[];
+	let rows = sqlResult.results as IRow[];
 
 	// hide columns like button
 	rows.map((row) => enrichColumns(row, metadata, collaborators));

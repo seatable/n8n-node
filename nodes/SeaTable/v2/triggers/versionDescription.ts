@@ -57,7 +57,7 @@ export const versionDescription: INodeTypeDescription = {
 				'The name of SeaTable table to access. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 		},
 		{
-			displayName: 'View Name or ID (not yet used, optional)',
+			displayName: 'View Name or ID (optional)',
 			name: 'viewName',
 			type: 'options',
 			required: false,

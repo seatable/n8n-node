@@ -2,7 +2,7 @@ import type { AllEntities, Entity, PropertiesOf } from 'n8n-workflow';
 
 type SeaTableMap = {
 	row: 'create' | 'get' | 'search' | 'update' | 'remove' | 'lock' | 'unlock';
-	base: 'snapshot' | 'metadata' | 'apiCall';
+	base: 'snapshot' | 'metadata' | 'apiCall' | 'collaborator';
 	link: 'add' | 'remove';
 	asset: 'upload' | 'getPublicURL';
 };
@@ -161,6 +161,8 @@ export interface ICollaborator {
 	email: string;
 	name: string;
 	contact_email: string;
+	avatar_url?: string;
+	id_in_org?: string;
 }
 
 export interface IColumnDigitalSignature {

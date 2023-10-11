@@ -52,7 +52,7 @@ export const baseApiCallDescription: BaseProperties = [
 		default: '',
 	},
 	{
-		displayName: 'The Authentication header is included automatically',
+		displayName: 'Hint: The Authentication header is included automatically.',
 		name: 'notice',
 		type: 'notice',
 		default: '',

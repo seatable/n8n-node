@@ -18,6 +18,7 @@ import { schema } from './Schema';
 
 import type {
 	ICollaborator,
+	ICollaboratorsResult,
 	ICredential,
 	ICtx,
 	IDtableMetadataColumn,
@@ -29,6 +30,7 @@ import type {
 	IFile,
 } from './actions/Interfaces';
 
+// remove last backslash
 const userBaseUri = (uri?: string) => {
 	if (uri === undefined) return uri;
 	if (uri.endsWith('/')) return uri.slice(0, -1);
@@ -87,7 +89,7 @@ export async function seaTableApiRequest(
 
 	await getBaseAccessToken.call(this, ctx);
 
-	// some api-endpoints require the api_token instead of base_access_token.
+	// some API endpoints require the api_token instead of base_access_token.
 	const token =
 		endpoint.indexOf('/api/v2.1/dtable/app-download-link/') === 0 ||
 		endpoint == '/api/v2.1/dtable/app-upload-link/' ||
@@ -118,7 +120,8 @@ export async function seaTableApiRequest(
 
 	options = Object.assign({}, options, option);
 
-	console.log(options);
+	// DEBUG-MODE OR API-REQUESTS
+	// console.log(options);
 
 	if (Object.keys(body).length === 0) {
 		delete options.body;
@@ -192,6 +195,19 @@ export async function setableApiRequestAllItems(
 }
 */
 
+export async function getBaseCollaborators(
+	this: ILoadOptionsFunctions | IExecuteFunctions | IPollFunctions,
+): Promise<any> {
+	let collaboratorsResult: ICollaboratorsResult = await seaTableApiRequest.call(
+		this,
+		{},
+		'GET',
+		'/dtable-server/api/v1/dtables/{{dtable_uuid}}/related-users/',
+	);
+	let collaborators: ICollaborator[] = collaboratorsResult.user_list || [];
+	return collaborators;
+}
+
 export async function getTableColumns(
 	this: ILoadOptionsFunctions | IExecuteFunctions | IPollFunctions,
 	tableName: string,
@@ -213,7 +229,7 @@ export async function getTableColumns(
 	return [];
 }
 
-// brauche ich die hier? ist doch in SeatableTrigger.nodes.ts drin.
+// brauche ich die hier? ist doch in SeatableTrigger.nodes.ts drin. -> brauche ich nur in triggers
 export async function getTableViews(
 	this: ILoadOptionsFunctions | IExecuteFunctions | IPollFunctions,
 	tableName: string,
@@ -485,14 +501,78 @@ export function rowMapKeyToName(row: IRow, columns: TDtableMetadataColumns): IRo
 	return mappedRow;
 }
 
+// using create, I input a string like a5adebe279e04415a28b2c7e256e9e8d@auth.local and it should be transformed to an array.
+// same with multi-select.
+export function splitStringColumnsToArrays(
+	row: IRowObject,
+	columns: TDtableMetadataColumns,
+): IRowObject {
+	columns.map((column) => {
+		if (column.type == 'collaborator' || column.type == 'multiple-select') {
+			if (typeof row[column.name] === 'string') {
+				const input = row[column.name] as string;
+				row[column.name] = input.split(',').map((item) => item.trim());
+			}
+		}
+	});
+	return row;
+}
+
+/*
+export function fixCollInput(
+	row: IRowObject,
+	columns: TDtableMetadataColumns,
+	collaboratorList: any,
+): IRowObject {
+	columns.map((column) => {
+		if (column.type == 'collaborator') {
+			console.log('Collaborator erkannt');
+			// hier muss noch mehr logik hin.
+			console.log('DAS IST DIE ROW:' + row);
+			row[column.name] = [row[column.name]];
+		}
+	});
+	return row;
+}
+*/
+
+// was soll diese Funktion machen???
+// sollte eher heißen: remove nonUpdateColumnTypes and only add allowed columns!
 export function rowExport(row: IRowObject, columns: TDtableMetadataColumns): IRowObject {
-	for (const columnName of Object.keys(columns)) {
-		if (!columns.find(namePredicate(columnName))) {
-			delete row[columnName];
+	let rowAllowed = {} as IRowObject;
+	columns.map((column) => {
+		if (column.type == 'collaborator') {
+			// nehme email oder auth.local??
+			//console.log('Collaborator erkannt');
+		}
+		if (column.type == 'multiple-select') {
+			// splitten anhand von komma, wenn string erkannt
+			console.log('Multiple select erkannt');
+		}
+
+		//if (!columns.find(namePredicate(column.name))) {
+		//console.log('allow: ' + column.name);
+		//delete row[column.name];
+		if (row[column.name]) {
+			rowAllowed[column.name] = row[column.name];
+		}
+	});
+	return rowAllowed;
+}
+
+/*
+	//for (const columnName of Object.keys(columns)) {
+	for (const column of columns)
+		if (column.hasOwnProperty('name')) {
+			console.log('columnName: ' + column.name);
+			if (!columns.find(namePredicate(column.name))) {
+				delete row[column.name];
+			}
 		}
 	}
 	return row;
 }
+*/
 
 export const dtableSchemaIsColumn = (column: IDtableMetadataColumn): boolean =>
 	!!schema.columnTypes[column.type];

@@ -1,10 +1,11 @@
 import * as snapshot from './snapshot';
 import * as metadata from './metadata';
 import * as apiCall from './apiCall';
+import * as collaborator from './collaborator';
 
 import type { INodeProperties } from 'n8n-workflow';
 
-export { snapshot, metadata, apiCall };
+export { snapshot, metadata, apiCall, collaborator };
 
 export const descriptions: INodeProperties[] = [
 	{
@@ -28,13 +29,19 @@ export const descriptions: INodeProperties[] = [
 				name: 'Metadata',
 				value: 'metadata',
 				description: 'Get the complete metadata of the base',
-				action: 'Get the base metadata',
+				action: 'Get metadata of a base',
 			},
 			{
 				name: 'API Call',
 				value: 'apiCall',
-				description: 'Perform an authorized API call',
-				action: 'Make API Call',
+				description: 'Perform an authorized API call (Base Operation)',
+				action: 'Make an API Call',
+			},
+			{
+				name: 'Collaborator',
+				value: 'collaborator',
+				description: 'Get this username from the email or name of a collaborator.',
+				action: 'Get username from email or name',
 			},
 		],
 		default: '',
@@ -42,4 +49,5 @@ export const descriptions: INodeProperties[] = [
 	...snapshot.description,
 	...metadata.description,
 	...apiCall.description,
+	...collaborator.description,
 ];

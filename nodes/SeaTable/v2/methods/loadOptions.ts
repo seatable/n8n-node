@@ -1,5 +1,5 @@
 import type { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
-import { getTableColumns, seaTableApiRequest } from '../GenericFunctions';
+import { getTableColumns, seaTableApiRequest, updateAble } from '../GenericFunctions';
 import type { IRow } from '../actions/Interfaces';
 
 export async function getTableNames(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -60,6 +60,7 @@ export async function getSearchableColumns(
 		for (const col of columns.columns) {
 			if (
 				col.type === 'text' ||
+				col.type === 'long-text' ||
 				col.type === 'number' ||
 				col.type === 'single-select' ||
 				col.type === 'email' ||
@@ -161,7 +162,11 @@ export async function getTableUpdateAbleColumns(
 	this: ILoadOptionsFunctions,
 ): Promise<INodePropertyOptions[]> {
 	const tableName = this.getNodeParameter('tableName') as string;
-	const columns = await getTableColumns.call(this, tableName);
+	let columns = await getTableColumns.call(this, tableName);
+
+	// remove columns that could not be filled
+	columns = updateAble(columns);
+
 	return columns
 		.filter((column) => column.editable)
 		.map((column) => ({ name: column.name, value: column.name }));

@@ -1,9 +1,7 @@
 ## new questions:
 
 - SeaTable.svg is missing -> manual copy is required.
-- was wenn unlock/lock nicht zur verfügung steht -> testen mit free!
-- prevent getcollaborators if already received (search, get, ...) -> for every item, I request it...
-- Suche in eine number column geht nicht.
+- was wenn unlock/lock nicht zur verfügung steht -> testen mit free! -> geht auch.
 
 ----------
 
