@@ -12,7 +12,7 @@ import type {
 } from 'n8n-workflow';
 import { NodeApiError } from 'n8n-workflow';
 
-import type { TDtableMetadataColumns, TDtableViewColumns, TEndpointVariableName } from './types';
+import type { TDtableMetadataColumns, TEndpointVariableName } from './types';
 
 import { schema } from './Schema';
 
@@ -127,12 +127,6 @@ export async function seaTableApiRequest(
 		delete options.body;
 	}
 
-	/*
-	if (Object.keys(option).length !== 0) {
-		Object.assign(options, option);
-	}
-	*/
-
 	try {
 		return await this.helpers.httpRequest(options);
 	} catch (error) {
@@ -230,6 +224,7 @@ export async function getTableColumns(
 }
 
 // brauche ich die hier? ist doch in SeatableTrigger.nodes.ts drin. -> brauche ich nur in triggers
+/* moved to loadOptions.ts
 export async function getTableViews(
 	this: ILoadOptionsFunctions | IExecuteFunctions | IPollFunctions,
 	tableName: string,
@@ -245,6 +240,7 @@ export async function getTableViews(
 	);
 	return views;
 }
+*/
 
 /*
 export function simplify(data: { results: IRow[] }, metadata: IDataObject) {
@@ -342,13 +338,14 @@ export function rowsSequence(rows: IRow[]) {
 }
 */
 
-/*
+/* used in SeaTableV1.node.ts
 export function rowDeleteInternalColumns(row: IRow): IRow {
 	Object.keys(schema.internalNames).forEach((columnName) => delete row[columnName]);
 	return row;
 }
 */
 
+/* used in SeaTableV1.node.ts
 function rowFormatColumn(input: unknown): boolean | number | string | string[] | null {
 	if (null === input || undefined === input) {
 		return null;
@@ -368,8 +365,9 @@ function rowFormatColumn(input: unknown): boolean | number | string | string[] |
 
 	return null;
 }
+*/
 
-// get collaborator info from @auth.local address
+// INTERNAL: get collaborator info from @auth.local address
 function getCollaboratorInfo(
 	authLocal: string | null | undefined,
 	collaboratorList: ICollaborator[],
@@ -381,7 +379,8 @@ function getCollaboratorInfo(
 	return collaboratorDetails;
 }
 
-export function getAssetPath(type: string, url: string) {
+// INTERNAL: split asset path.
+function getAssetPath(type: string, url: string) {
 	const parts = url.split(`/${type}/`);
 	if (parts[1]) {
 		return '/' + type + '/' + parts[1];
@@ -469,16 +468,21 @@ export function enrichColumns(
 	return row;
 }
 
+/* used in SeaTableV1.node.ts
 export function rowFormatColumns(row: IRow, columnNames: string[]): IRow {
 	const outRow = {} as IRow;
 	columnNames.forEach((c) => (outRow[c] = rowFormatColumn(row[c])));
 	return outRow;
 }
+*/
 
+/* used in SeaTableV1.node.ts
 export function rowsFormatColumns(rows: IRow[], columnNames: string[]) {
 	rows = rows.map((row) => rowFormatColumns(row, columnNames));
 }
+*/
 
+/* used in SeaTableV1.node.ts
 export function rowMapKeyToName(row: IRow, columns: TDtableMetadataColumns): IRow {
 	const mappedRow = {} as IRow;
 
@@ -500,6 +504,7 @@ export function rowMapKeyToName(row: IRow, columns: TDtableMetadataColumns): IRo
 
 	return mappedRow;
 }
+*/
 
 // using create, I input a string like a5adebe279e04415a28b2c7e256e9e8d@auth.local and it should be transformed to an array.
 // same with multi-select.
@@ -518,61 +523,16 @@ export function splitStringColumnsToArrays(
 	return row;
 }
 
-/*
-export function fixCollInput(
-	row: IRowObject,
-	columns: TDtableMetadataColumns,
-	collaboratorList: any,
-): IRowObject {
-	columns.map((column) => {
-		if (column.type == 'collaborator') {
-			console.log('Collaborator erkannt');
-			// hier muss noch mehr logik hin.
-			console.log('DAS IST DIE ROW:' + row);
-			row[column.name] = [row[column.name]];
-		}
-	});
-	return row;
-}
-*/
-
-// was soll diese Funktion machen???
-// sollte eher heißen: remove nonUpdateColumnTypes and only add allowed columns!
+// sollte eher heißen: remove nonUpdateColumnTypes and only use allowed columns!
 export function rowExport(row: IRowObject, columns: TDtableMetadataColumns): IRowObject {
 	let rowAllowed = {} as IRowObject;
 	columns.map((column) => {
-		if (column.type == 'collaborator') {
-			// nehme email oder auth.local??
-			//console.log('Collaborator erkannt');
-		}
-		if (column.type == 'multiple-select') {
-			// splitten anhand von komma, wenn string erkannt
-			console.log('Multiple select erkannt');
-		}
-
-		//if (!columns.find(namePredicate(column.name))) {
-		//console.log('allow: ' + column.name);
-		//delete row[column.name];
 		if (row[column.name]) {
 			rowAllowed[column.name] = row[column.name];
 		}
 	});
 	return rowAllowed;
 }
-
-/*
-	//for (const columnName of Object.keys(columns)) {
-	for (const column of columns)
-		if (column.hasOwnProperty('name')) {
-			console.log('columnName: ' + column.name);
-			if (!columns.find(namePredicate(column.name))) {
-				delete row[column.name];
-			}
-		}
-	}
-	return row;
-}
-*/
 
 export const dtableSchemaIsColumn = (column: IDtableMetadataColumn): boolean =>
 	!!schema.columnTypes[column.type];

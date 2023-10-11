@@ -1,5 +1,5 @@
 // ----------------------------------
-//         sea-table
+//         SeaTable
 // ----------------------------------
 
 export type TSeaTableServerVersion = '2.0.6';
