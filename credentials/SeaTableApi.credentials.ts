@@ -1,29 +1,10 @@
-import type {
-	ICredentialTestRequest,
-	ICredentialType,
-	INodeProperties,
-	//INodePropertyOptions,
-	//IAuthenticateGeneric,
-} from 'n8n-workflow';
-
-//import moment from 'moment-timezone';
-
-// Get options for timezones
-/*
-const timezones: INodePropertyOptions[] = moment.tz
-	.countries()
-	.reduce((tz: INodePropertyOptions[], country: string) => {
-		const zonesForCountry = moment.tz
-			.zonesForCountry(country)
-			.map((zone) => ({ value: zone, name: zone }));
-		return tz.concat(zonesForCountry);
-	}, []);
-	*/
+import type { ICredentialTestRequest, ICredentialType, INodeProperties } from 'n8n-workflow';
 
 export class SeaTableApi implements ICredentialType {
 	name = 'seaTableApi';
 	displayName = 'SeaTable API';
-	documentationUrl = 'https://docs.seatable.io/...more...to...come...about...api';
+	documentationUrl =
+		'https://seatable.io/docs/n8n-integration/erstellen-eines-api-tokens-fuer-n8n/?lang=auto';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Environment',
@@ -62,15 +43,6 @@ export class SeaTableApi implements ICredentialType {
 			typeOptions: { password: true },
 			default: '',
 		},
-		/*
-		{
-			displayName: 'Timezone',
-			name: 'timezone',
-			type: 'options',
-			default: '',
-			description: 'Your timezone',
-			options: [...timezones],
-		},*/
 	];
 
 	test: ICredentialTestRequest = {

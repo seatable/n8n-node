@@ -105,9 +105,8 @@ export class SeaTableTriggerV1 implements INodeType {
 		const simple = this.getNodeParameter('simple') as boolean;
 		const event = this.getNodeParameter('event') as string;
 		const ctx: ICtx = {};
-		const credentials = await this.getCredentials('seaTableApi');
+		//const credentials = await this.getCredentials('seaTableApi');
 
-		const timezone = (credentials.timezone as string) || 'Europe/Berlin';
 		const now = moment().utc().format();
 		const startDate = (webhookData.lastTimeChecked as string) || now;
 		const endDate = now;
@@ -126,8 +125,8 @@ export class SeaTableTriggerV1 implements INodeType {
 		} else {
 			rows = (await seaTableApiRequest.call(this, ctx, 'POST', endpoint, {
 				sql: `SELECT * FROM ${tableName}
-					WHERE ${filterField} BETWEEN "${moment(startDate).tz(timezone).format('YYYY-MM-D HH:mm:ss')}"
-					AND "${moment(endDate).tz(timezone).format('YYYY-MM-D HH:mm:ss')}"`,
+					WHERE ${filterField} BETWEEN "${moment(startDate).format('YYYY-MM-D HH:mm:ss')}"
+					AND "${moment(endDate).format('YYYY-MM-D HH:mm:ss')}"`,
 			})) as IRowResponse;
 		}
 

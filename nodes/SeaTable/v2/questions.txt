@@ -2,6 +2,7 @@
 
 - SeaTable.svg is missing -> manual copy is required.
 - was wenn unlock/lock nicht zur verfügung steht -> testen mit free! -> geht auch.
+- documentation - especially the credentials url
 
 ----------
 
