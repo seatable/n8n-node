@@ -7,7 +7,6 @@ import type {
 	ILoadOptionsFunctions,
 	IPollFunctions,
 	JsonObject,
-	IHttpRequestOptions,
 	IHttpRequestMethods,
 } from 'n8n-workflow';
 import { NodeApiError } from 'n8n-workflow';
@@ -97,8 +96,8 @@ export async function seaTableApiRequest(
 			? `${ctx?.credentials?.token}`
 			: `${ctx?.base?.access_token}`;
 
-	let options: IHttpRequestOptions = {
-		url: url || `${resolveBaseUri(ctx)}${endpointCtxExpr(ctx, endpoint)}`,
+	let options: OptionsWithUri = {
+		uri: url || `${resolveBaseUri(ctx)}${endpointCtxExpr(ctx, endpoint)}`,
 		headers: {
 			Authorization: `Token ${token}`,
 		},
@@ -108,17 +107,22 @@ export async function seaTableApiRequest(
 		json: true,
 	};
 
+	if (Object.keys(option).length !== 0) {
+		options = Object.assign({}, options, option);
+	}
+
 	// remove header from download request.
 	if (endpoint.indexOf('/seafhttp/files/') === 0) {
 		delete options.headers;
 	}
 
 	if (endpoint.indexOf('/seafhttp/upload-api') === 0) {
-		delete options.json;
-		//console.log(options);
+		options.json = false;
+		options.headers = {
+			...options.headers,
+			'Content-Type': 'multipart/form-data',
+		};
 	}
-
-	options = Object.assign({}, options, option);
 
 	// DEBUG-MODE OR API-REQUESTS
 	// console.log(options);
@@ -128,7 +132,7 @@ export async function seaTableApiRequest(
 	}
 
 	try {
-		return await this.helpers.httpRequest(options);
+		return this.helpers.requestWithAuthentication.call(this, 'seaTableApi', options);
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
