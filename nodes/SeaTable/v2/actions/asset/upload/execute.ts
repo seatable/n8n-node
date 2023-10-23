@@ -1,6 +1,6 @@
-import type { IExecuteFunctions, IDataObject, INodeExecutionData} from 'n8n-workflow';
+import type { IExecuteFunctions, IDataObject, INodeExecutionData } from 'n8n-workflow';
 import { seaTableApiRequest } from '../../../GenericFunctions';
-import type { IUploadLink } from '../../Interfaces';
+import type { IUploadLink, IRowObject } from '../../Interfaces';
 
 export async function upload(
 	this: IExecuteFunctions,
@@ -10,19 +10,22 @@ export async function upload(
 	const uploadColumn = this.getNodeParameter('uploadColumn', index) as any;
 	const uploadColumnType = uploadColumn.split(':::')[1];
 	const dataPropertyName = this.getNodeParameter('dataPropertyName', index) as string;
-	const	uploadLink = (await seaTableApiRequest.call(
-			this,
-			{},
-			'GET',
-			'/api/v2.1/dtable/app-upload-link/',
-		)) as IUploadLink;
+	const tableName = this.getNodeParameter('tableName', index) as string;
+	const rowId = this.getNodeParameter('rowId', index) as string;
+	const workspaceId = this.getNodeParameter('workspaceId', index) as string;
+	const uploadLink = (await seaTableApiRequest.call(
+		this,
+		{},
+		'GET',
+		'/api/v2.1/dtable/app-upload-link/',
+	)) as IUploadLink;
 
 	// Get the binary data
 	const fileBufferData = await this.helpers.getBinaryDataBuffer(index, dataPropertyName);
 	const binaryData = this.helpers.assertBinaryData(index, dataPropertyName);
 	// Create our request option
 	const options = {
-		formData : {
+		formData: {
 			file: {
 				value: fileBufferData,
 				options: {
@@ -32,8 +35,9 @@ export async function upload(
 			},
 			parent_dir: uploadLink.parent_path,
 			replace: '0',
-			relative_path: uploadColumnType === 'image' ? uploadLink.img_relative_path : uploadLink.file_relative_path,
-		}
+			relative_path:
+				uploadColumnType === 'image' ? uploadLink.img_relative_path : uploadLink.file_relative_path,
+		},
 	};
 
 	// Send the request
@@ -48,11 +52,43 @@ export async function upload(
 		options,
 	);
 
-	// uploadAsset now contains the data that can be used to attach the file to a column in a base
-
-
 	// now step 2 (attaching the file to a column in a base)
-	// ...
+	for (let c = 0; c < uploadAsset.length; c++) {
+		const body = {
+			table_name: tableName,
+			row_id: rowId,
+			row: {},
+		} as IDataObject;
+		let rowInput = {} as IRowObject;
+
+		const filePath = [
+			`/workspace/${workspaceId}${uploadLink.parent_path}/${uploadLink.img_relative_path}/${uploadAsset[c].name}`,
+		];
+
+		if (uploadColumnType === 'image') {
+			rowInput[uploadColumn.split(':::')[0]] = filePath;
+		} else if (uploadColumnType === 'file') {
+			rowInput[uploadColumn.split(':::')[0]] = uploadAsset;
+			uploadAsset[c].type = 'file';
+			uploadAsset[c].url = filePath;
+		}
+		body.row = rowInput;
+		//console.log(body);
+
+		const responseData = await seaTableApiRequest.call(
+			this,
+			{},
+			'PUT',
+			'/dtable-server/api/v1/dtables/{{dtable_uuid}}/rows/',
+			body,
+		);
+
+		uploadAsset[c]['upload_successful'] = responseData.success;
+	}
+
+	// checks einbauen, dass images nur in image-spalten und...
+	// woher kommt die workspace?
+	// replace noch wirklich überprüfen? wenn schon eine datei drin ist, ergänzen???
 
 	return this.helpers.returnJsonArray(uploadAsset as IDataObject[]);
 }

@@ -55,6 +55,25 @@ export const assetUploadDescription: AssetProperties = [
 		default: '',
 	},
 	{
+		displayName: 'Workspace ID',
+		name: 'workspaceId',
+		type: 'number',
+		typeOptions: {
+			minValue: 1,
+			numberStepSize: 1,
+		},
+		required: true,
+		displayOptions: {
+			show: {
+				resource: ['asset'],
+				operation: ['upload'],
+			},
+		},
+		default: '',
+		description:
+			'How to get the workspace ID: https://seatable.io/docs/arbeiten-mit-gruppen/workspace-id-einer-gruppe-ermitteln/?lang=auto',
+	},
+	{
 		displayName: 'Property Name',
 		name: 'dataPropertyName',
 		type: 'string',
@@ -68,7 +87,7 @@ export const assetUploadDescription: AssetProperties = [
 		},
 		description: 'Name of the binary property which contains the data for the file to be written',
 	},
-	{
+	/*{
 		displayName: 'Replace',
 		name: 'replace',
 		type: 'boolean',
@@ -80,5 +99,5 @@ export const assetUploadDescription: AssetProperties = [
 			},
 		},
 		description: 'Replace existing file if the file/image already exists with same name.',
-	},
+	},*/
 ];

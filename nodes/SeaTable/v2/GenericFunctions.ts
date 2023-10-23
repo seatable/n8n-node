@@ -116,8 +116,9 @@ export async function seaTableApiRequest(
 		delete options.headers;
 	}
 
+	// enhance header for upload request
 	if (endpoint.indexOf('/seafhttp/upload-api') === 0) {
-		options.json = false;
+		options.json = true;
 		options.headers = {
 			...options.headers,
 			'Content-Type': 'multipart/form-data',
