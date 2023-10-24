@@ -1,6 +1,10 @@
 # Changelog
 
-## Released (2023-10-24 1.1.0)
+## Released (2023-10-24 1.2.0)
+
+### Wording issues
+
+- Change of the README.md
 
 ### Bug fixes
 

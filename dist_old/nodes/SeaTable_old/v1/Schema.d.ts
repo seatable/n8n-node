@@ -1,0 +1,54 @@
+import type { TColumnType, TDateTimeFormat, TInheritColumnKey } from './types';
+export declare type ColumnType = keyof typeof schema.columnTypes;
+export declare const schema: {
+    rowFetchSegmentLimit: number;
+    dateTimeFormat: TDateTimeFormat;
+    internalNames: {
+        _seq: TColumnType;
+        _id: TColumnType;
+        _creator: TColumnType;
+        _ctime: TColumnType;
+        _last_modifier: TColumnType;
+        _mtime: TColumnType;
+    };
+    columnTypes: {
+        number: string;
+        url: string;
+        ctime: string;
+        mtime: string;
+        creator: string;
+        "last-modifier": string;
+        text: string;
+        "long-text": string;
+        collaborator: string;
+        date: string;
+        duration: string;
+        "single-select": string;
+        "multiple-select": string;
+        email: string;
+        rate: string;
+        checkbox: string;
+        formula: string;
+        "auto-number": string;
+    };
+    nonUpdateAbleColumnTypes: {
+        number: TColumnType;
+        url: TColumnType;
+        ctime: TColumnType;
+        mtime: TColumnType;
+        creator: TColumnType;
+        "last-modifier": TColumnType;
+        text: TColumnType;
+        "long-text": TColumnType;
+        collaborator: TColumnType;
+        date: TColumnType;
+        duration: TColumnType;
+        "single-select": TColumnType;
+        "multiple-select": TColumnType;
+        email: TColumnType;
+        rate: TColumnType;
+        checkbox: TColumnType;
+        formula: TColumnType;
+        "auto-number": TColumnType;
+    };
+};

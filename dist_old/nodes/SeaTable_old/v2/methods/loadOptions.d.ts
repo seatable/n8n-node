@@ -1,0 +1,10 @@
+import type { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
+export declare function getTableNames(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]>;
+export declare function getTableNameAndId(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]>;
+export declare function getSearchableColumns(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]>;
+export declare function getLinkColumns(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]>;
+export declare function getAssetColumns(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]>;
+export declare function getSignatureColumns(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]>;
+export declare function getTableUpdateAbleColumns(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]>;
+export declare function getRowIds(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]>;
+export declare function getTableViews(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]>;

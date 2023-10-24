@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-seatable",
-	"version": "1.0.0",
+	"version": "1.2.0",
 	"description": "SeaTable n8n app to interact with any SeaTable Server.",
 	"keywords": [
 		"n8n-community-node-package"
@@ -33,7 +33,8 @@
 			"dist/credentials/SeaTableApi.credentials.js"
 		],
 		"nodes": [
-			"dist/nodes/SeaTable/SeaTable.node.js"
+			"dist/nodes/SeaTable/SeaTable.node.js",
+			"dist/nodes/SeaTable/SeaTableTrigger.node.js"
 		]
 	},
 	"devDependencies": {

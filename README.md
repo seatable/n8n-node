@@ -2,13 +2,11 @@
 
 ![n8n.io - Workflow Automation](https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-logo.png)
 
-[n8n](https://www.n8n.io) nodes to trigger workflows from Discord or send interactive messages. Uses the components API which allows to create dialogs (e.g. attach buttons and wait for the user to click on them).
-
-These nodes do not use webhooks but a Discord bot to enable two-way communication. The bot automatically launches into a main process once configured and transmits or receives data from child processes when a node is executed.
+This SeaTable node allows you to automate work in Seatable, and integrate SeaTable with other applications. n8n has built-in support for a wide range of SeaTable features, including creating, reading, listing, updating and deleting entries in a SeaTable base.
 
 ## How to install
 
-n8n is shipped with a SeaTable Node. Therefore an installation is usually not required.
+n8n is shipped with a SeaTable node. Therefore an installation is usually not required.
 You can install this community node, if you want to test newest features, that might not be available with the version shipped with n8n.
 
 ### Community Nodes (Recommended)
