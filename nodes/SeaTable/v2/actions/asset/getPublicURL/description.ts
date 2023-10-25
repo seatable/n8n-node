@@ -1,7 +1,7 @@
 import type { AssetProperties } from '../../Interfaces';
 
 export const assetGetPublicURLDescription: AssetProperties = [
-	{
+	/*{
 		displayName: 'Table Name',
 		name: 'tableName',
 		type: 'options',
@@ -19,7 +19,7 @@ export const assetGetPublicURLDescription: AssetProperties = [
 		default: '',
 		description:
 			'The name of SeaTable table to access. Choose from the list, or specify a name using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
-	},
+	},*/
 	{
 		displayName: 'Asset path',
 		name: 'assetPath',

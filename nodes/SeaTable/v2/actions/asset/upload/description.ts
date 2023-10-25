@@ -44,6 +44,7 @@ export const assetUploadDescription: AssetProperties = [
 		type: 'options',
 		required: true,
 		typeOptions: {
+			loadOptionsDependsOn: ['tableName'],
 			loadOptionsMethod: 'getRowIds',
 		},
 		displayOptions: {

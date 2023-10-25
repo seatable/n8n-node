@@ -26,6 +26,7 @@ export const rowLockDescription: RowProperties = [
 		type: 'options',
 		required: true,
 		typeOptions: {
+			loadOptionsDependsOn: ['tableName'],
 			loadOptionsMethod: 'getRowIds',
 		},
 		displayOptions: {
