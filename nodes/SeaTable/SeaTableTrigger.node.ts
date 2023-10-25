@@ -122,6 +122,12 @@ export class SeaTableTrigger implements INodeType {
 				description:
 					'Simplified returns only the columns of your base. Non-simplified will return additional columns like _ctime (=creation time), _mtime (=modification time) etc.',
 			},
+			{
+				displayName: '"Fetch Test Event" returns max. three items of the last hour.',
+				name: 'notice',
+				type: 'notice',
+				default: '',
+			},
 		],
 	};
 
@@ -167,9 +173,10 @@ export class SeaTableTrigger implements INodeType {
 		let rows: IRow[];
 		let sqlResult: IRowResponse;
 
+		const limit = this.getMode() === 'manual' ? 3 : 1000;
+
 		// New Signature
 		if (event == 'newAsset') {
-			const limit = this.getMode() === 'manual' ? 3 : 1000;
 			const endpoint = '/dtable-db/api/v1/query/{{dtable_uuid}}/';
 			sqlResult = await seaTableApiRequest.call(this, ctx, 'POST', endpoint, {
 				sql: `SELECT _id, _ctime, _mtime, \`${assetColumn}\` FROM ${tableName} WHERE \`${assetColumn}\` IS NOT NULL ORDER BY _mtime DESC LIMIT ${limit}`,
@@ -216,7 +223,7 @@ export class SeaTableTrigger implements INodeType {
 				{
 					table_name: tableName,
 					view_name: viewName,
-					limit: 1000,
+					limit: limit,
 				},
 			);
 
@@ -225,22 +232,27 @@ export class SeaTableTrigger implements INodeType {
 				requestMeta.metadata.tables.find((table) => table.name === tableName)?.columns ?? [];
 
 			// remove unwanted rows that are too old (compare startDate with _ctime or _mtime)
-			rows = requestRows.rows.filter(
-				(obj) => new Date(obj[filterField]) > new Date(startDate),
-			) as IRow[];
+			if (this.getMode() === 'manual') {
+				rows = requestRows.rows as IRow[];
+			} else {
+				rows = requestRows.rows.filter(
+					(obj) => new Date(obj[filterField]) > new Date(startDate),
+				) as IRow[];
+			}
 		}
 
 		// No view => use SQL-Query
 		else {
-			const limit = this.getMode() === 'manual' ? 3 : 1000;
 			const endpoint = '/dtable-db/api/v1/query/{{dtable_uuid}}/';
+			const sqlQuery = `SELECT * FROM \`${tableName}\` WHERE ${filterField} BETWEEN "${moment(
+				startDate,
+			).format('YYYY-MM-D HH:mm:ss')}" AND "${moment(endDate).format(
+				'YYYY-MM-D HH:mm:ss',
+			)}" ORDER BY ${filterField} DESC LIMIT ${limit}`;
 			sqlResult = await seaTableApiRequest.call(this, ctx, 'POST', endpoint, {
-				sql: `SELECT * FROM \`${tableName}\`
-						WHERE ${filterField} BETWEEN "${moment(startDate).format('YYYY-MM-D HH:mm:ss')}"
-						AND "${moment(endDate).format('YYYY-MM-D HH:mm:ss')} ORDER BY ${filterField} DESC LIMIT ${limit}"`,
+				sql: sqlQuery,
 				convert_keys: true,
 			});
-			//}
 			metadata = sqlResult.metadata as IDtableMetadataColumn[];
 			rows = sqlResult.results as IRow[];
 		}
@@ -257,7 +269,7 @@ export class SeaTableTrigger implements INodeType {
 		);
 		let collaborators: ICollaborator[] = collaboratorsResult.user_list || [];
 
-		if (Array.isArray(rows) && !rows.length) {
+		if (Array.isArray(rows) && rows.length > 0) {
 			// remove columns starting with _ if simple;
 			if (simple) {
 				rows = rows.map((row) => simplify_new(row));

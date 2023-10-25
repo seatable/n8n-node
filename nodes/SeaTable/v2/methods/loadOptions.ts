@@ -172,9 +172,10 @@ export async function getTableUpdateAbleColumns(
 		.map((column) => ({ name: column.name, value: column.name }));
 }
 
-export async function getRowIds(this: ILoadOptionsFunctions) {
+export async function getRowIds(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 	const tableName = this.getNodeParameter('tableName') as string;
 	const returnData: INodePropertyOptions[] = [];
+
 	if (tableName) {
 		const sqlResult = await seaTableApiRequest.call(
 			this,

@@ -26,6 +26,7 @@ export const rowGetDescription: RowProperties = [
 		type: 'options',
 		required: true,
 		typeOptions: {
+			loadOptionsDependsOn: ['tableName'],
 			loadOptionsMethod: 'getRowIds',
 		},
 		displayOptions: {

@@ -22,7 +22,6 @@ export async function upload(
 
 	// Get the binary data
 	const fileBufferData = await this.helpers.getBinaryDataBuffer(index, dataPropertyName);
-	// @ts-ignore
 	const binaryData = this.helpers.assertBinaryData(index, dataPropertyName);
 	// Create our request option
 	const options = {
