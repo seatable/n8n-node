@@ -139,61 +139,6 @@ export async function seaTableApiRequest(
 	}
 }
 
-/*
-export async function getCollaborator(
-	this: ILoadOptionsFunctions | IExecuteFunctions | IPollFunctions,
-	ctx: ICtx = {},
-): Promise<any> {
-	let collaboratorsResult: ICollaboratorsResult = await seaTableApiRequest.call(
-		this,
-		ctx,
-		'GET',
-		'/dtable-server/api/v1/dtables/{{dtable_uuid}}/related-users/',
-	);
-	let collaborators = collaboratorsResult.user_list || [];
-	return collaborators;
-}
-*/
-
-/*
-export async function setableApiRequestAllItems(
-	this: IExecuteFunctions | IPollFunctions,
-	ctx: ICtx,
-	propertyName: string,
-	method: string,
-	endpoint: string,
-	body: IDataObject,
-	query?: IDataObject,
-): Promise<any> {
-	if (query === undefined) {
-		query = {};
-	}
-	const segment = schema.rowFetchSegmentLimit;
-	query.start = 0;
-	query.limit = segment;
-
-	const returnData: IDataObject[] = [];
-
-	let responseData;
-
-	do {
-		responseData = (await seaTableApiRequest.call(
-			this,
-			ctx,
-			method,
-			endpoint,
-			body,
-			query,
-		)) as unknown as IRow[];
-		//@ts-ignore
-		returnData.push.apply(returnData, responseData[propertyName] as IDataObject[]);
-		query.start = +query.start + segment;
-	} while (responseData && responseData.length > segment - 1);
-
-	return returnData;
-}
-*/
-
 export async function getBaseCollaborators(
 	this: ILoadOptionsFunctions | IExecuteFunctions | IPollFunctions,
 ): Promise<any> {
@@ -228,62 +173,12 @@ export async function getTableColumns(
 	return [];
 }
 
-// brauche ich die hier? ist doch in SeatableTrigger.nodes.ts drin. -> brauche ich nur in triggers
-/* moved to loadOptions.ts
-export async function getTableViews(
-	this: ILoadOptionsFunctions | IExecuteFunctions | IPollFunctions,
-	tableName: string,
-	ctx: ICtx = {},
-): Promise<TDtableViewColumns> {
-	const { views } = await seaTableApiRequest.call(
-		this,
-		ctx,
-		'GET',
-		'/dtable-server/api/v1/dtables/{{dtable_uuid}}/views',
-		{},
-		{ table_name: tableName },
-	);
-	return views;
-}
-*/
-
-/*
-export function simplify(data: { results: IRow[] }, metadata: IDataObject) {
-	return data.results.map((row: IDataObject) => {
-		for (const key of Object.keys(row)) {
-			if (!key.startsWith('_')) {
-				row[metadata[key] as string] = row[key];
-				delete row[key];
-			}
-		}
-		return row;
-	});
-}
-*/
-
 export function simplify_new(row: IRow) {
 	for (const key of Object.keys(row)) {
 		if (key.startsWith('_')) delete row[key];
 	}
 	return row;
 }
-
-/*
-export function getColumns(data: { metadata: [{ key: string; name: string }] }) {
-	return data.metadata.reduce(
-		(obj, value) => Object.assign(obj, { [`${value.key}`]: value.name }),
-		{},
-	);
-}
-*/
-
-/*
-export function getDownloadableColumns(data: {
-	metadata: [{ key: string; name: string; type: string }];
-}) {
-	return data.metadata.filter((row) => ['image', 'file'].includes(row.type)).map((row) => row.name);
-}
-*/
 
 /*const uniquePredicate = (current: string, index: number, all: string[]) =>
 	all.indexOf(current) === index;
@@ -300,77 +195,6 @@ export const split = (subject: string): string[] =>
 		.split(/\s*((?:[^\\,]*?(?:\\[\s\S])*)*?)\s*(?:,|$)/)
 		.filter((s) => s.length)
 		.map((s) => s.replace(/\\([\s\S])/gm, ($0, $1) => $1));
-
-/*
-export function columnNamesToArray(columnNames: string): string[] {
-	return columnNames ? split(columnNames).filter(nonInternalPredicate).filter(uniquePredicate) : [];
-}
-*/
-
-/*
-export function columnNamesGlob(
-	columnNames: string[],
-	dtableColumns: TDtableMetadataColumns,
-): string[] {
-	const buffer: string[] = [];
-	const names: string[] = dtableColumns.map((c) => c.name).filter(nonInternalPredicate);
-	columnNames.forEach((columnName) => {
-		if (columnName !== '*') {
-			buffer.push(columnName);
-			return;
-		}
-		buffer.push(...names);
-	});
-	return buffer.filter(uniquePredicate);
-}
-*/
-
-/**
- * sequence rows on _seq
- */
-/*
-export function rowsSequence(rows: IRow[]) {
-	const l = rows.length;
-	if (l) {
-		const [first] = rows;
-		if (first?._seq !== undefined) {
-			return;
-		}
-	}
-	for (let i = 0; i < l; ) {
-		rows[i]._seq = ++i;
-	}
-}
-*/
-
-/* used in SeaTableV1.node.ts
-export function rowDeleteInternalColumns(row: IRow): IRow {
-	Object.keys(schema.internalNames).forEach((columnName) => delete row[columnName]);
-	return row;
-}
-*/
-
-/* used in SeaTableV1.node.ts
-function rowFormatColumn(input: unknown): boolean | number | string | string[] | null {
-	if (null === input || undefined === input) {
-		return null;
-	}
-
-	if (typeof input === 'boolean' || typeof input === 'number' || typeof input === 'string') {
-		return input;
-	}
-
-	if (Array.isArray(input) && input.every((i) => typeof i === 'string')) {
-		return input;
-	} else if (Array.isArray(input) && input.every((i) => typeof i === 'object')) {
-		const returnItems = [] as string[];
-		input.every((i) => returnItems.push(i.display_value as string));
-		return returnItems;
-	}
-
-	return null;
-}
-*/
 
 // INTERNAL: get collaborator info from @auth.local address
 function getCollaboratorInfo(
@@ -472,44 +296,6 @@ export function enrichColumns(
 
 	return row;
 }
-
-/* used in SeaTableV1.node.ts
-export function rowFormatColumns(row: IRow, columnNames: string[]): IRow {
-	const outRow = {} as IRow;
-	columnNames.forEach((c) => (outRow[c] = rowFormatColumn(row[c])));
-	return outRow;
-}
-*/
-
-/* used in SeaTableV1.node.ts
-export function rowsFormatColumns(rows: IRow[], columnNames: string[]) {
-	rows = rows.map((row) => rowFormatColumns(row, columnNames));
-}
-*/
-
-/* used in SeaTableV1.node.ts
-export function rowMapKeyToName(row: IRow, columns: TDtableMetadataColumns): IRow {
-	const mappedRow = {} as IRow;
-
-	// move internal columns first
-	Object.keys(schema.internalNames).forEach((key) => {
-		if (row[key]) {
-			mappedRow[key] = row[key];
-			delete row[key];
-		}
-	});
-
-	// pick each by its key for name
-	Object.keys(row).forEach((key) => {
-		const column = columns.find((c) => c.key === key);
-		if (column) {
-			mappedRow[column.name] = row[key];
-		}
-	});
-
-	return mappedRow;
-}
-*/
 
 // using create, I input a string like a5adebe279e04415a28b2c7e256e9e8d@auth.local and it should be transformed to an array.
 // same with multi-select.

@@ -73,7 +73,6 @@ export async function upload(
 			uploadAsset[c].url = filePath;
 		}
 		body.row = rowInput;
-		//console.log(body);
 
 		const responseData = await seaTableApiRequest.call(
 			this,
@@ -85,10 +84,6 @@ export async function upload(
 
 		uploadAsset[c]['upload_successful'] = responseData.success;
 	}
-
-	// checks einbauen, dass images nur in image-spalten und...
-	// woher kommt die workspace?
-	// replace noch wirklich überprüfen? wenn schon eine datei drin ist, ergänzen???
 
 	return this.helpers.returnJsonArray(uploadAsset as IDataObject[]);
 }

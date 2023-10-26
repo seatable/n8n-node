@@ -1,12 +1,15 @@
 # Changelog
 
-## Released (2023-10-25 1.2.1)
+## Released (2023-10-26 1.3.0)
+
+Finalisation of rework. All actions and triggers are fully functional.
 
 ### Bug fixes
 
 - Trigger Test Event shows only up to three items
 - Triggers show test results
 - Get action: loadoptions depency added for row id
+- Upload action: correct workspace_id handling
 
 ## Released (2023-10-24 1.2.0)
 
