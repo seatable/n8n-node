@@ -1,5 +1,11 @@
 # Changelog
 
+## Released (2023-12-01 1.3.2)
+
+### Bug fixes
+
+- Fixing wrong file paths for uploaded images and files.
+
 ## Released (2023-10-26 1.3.0)
 
 Finalisation of rework. All actions and triggers are fully functional.
