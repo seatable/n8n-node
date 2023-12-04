@@ -1,5 +1,11 @@
 # Changelog
 
+## Released (2023-12-05 1.3.3)
+
+## Bug fixes
+
+- added missing loadOptionsDependsOn for update a row action
+
 ## Released (2023-12-01 1.3.2)
 
 ### Bug fixes
