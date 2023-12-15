@@ -1,8 +1,9 @@
 # Changelog
 
-## Released (2023-12-15 1.3.4)
+## Released (2023-12-15 1.3.5)
 
 - added new action "Get many rows"
+- new option in "search" action: Case Insensitive Search
 
 ## Released (2023-12-05 1.3.3)
 
