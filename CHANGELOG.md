@@ -1,5 +1,9 @@
 # Changelog
 
+## Released (2023-12-21 1.3.6)
+
+- fix "Make an API Call"
+
 ## Released (2023-12-15 1.3.5)
 
 - added new action "Get many rows"
