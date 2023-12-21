@@ -1,5 +1,9 @@
 # Changelog
 
+## Released (2023-12-15 1.3.4)
+
+- added new action "Get many rows"
+
 ## Released (2023-12-05 1.3.3)
 
 ## Bug fixes
