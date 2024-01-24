@@ -1,5 +1,12 @@
 # Changelog
 
+## Released (2024-01-08 1.4.0)
+
+improved "Upload Asset"
+
+- input `workspaceId` is not needed anymore
+- new options `Replace existing file` and `Append to column`
+
 ## Released (2023-12-21 1.3.6)
 
 - fix "Make an API Call"
