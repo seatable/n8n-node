@@ -1,5 +1,19 @@
 # Changelog
 
+## Released (2024-01-29 1.5.1)
+
+Minor fix for old version 1
+
+## Released (2024-01-29 1.5.0)
+
+Big Data support implemented
+
+- `create row` got a new option to write to normal or big data backend
+- `update row` can update normal and big data rows
+- `delete row` can delete rows from any backend
+- `link rows` can link rows from any backend
+- `unlink rows` supports big data and normal backend
+
 ## Released (2024-01-08 1.4.0)
 
 improved "Upload Asset"
