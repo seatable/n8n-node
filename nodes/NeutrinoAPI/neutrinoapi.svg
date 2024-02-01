@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:osb="http://www.openswatchbook.org/uri/2009/osb" height="335.59" width="335.59" version="1.1" viewBox="0 0 88.791664 88.791702">
+  <g transform="translate(-32.333 -96.5)">
+    <path d="m160 502.52v110h60v-10h-50v-100z" transform="scale(.26458)" fill="#71a865"/>
+    <path d="m160 452.52v10h50v115h-15v-100h-35v10h25v100h35v-135h-10z" transform="scale(.26458)" fill="#0972a5"/>
+    <path d="m185 402.52v35h100v15h-25v10h35v-35h-100v-25z" transform="scale(.26458)" fill="#71a865"/>
+    <path d="m310 427.52v50h-50v135h60v-10h-50v-115h50v-60z" transform="scale(.26458)" fill="#0972a5"/>
+    <rect height="2.6458" width="29.104" y="106.5" x="55.562" fill="#0972a5"/>
+    <path d="m285 502.52v85h35v-60h-10v50h-15v-65h25v-10z" transform="scale(.26458)" fill="#71a865"/>
+    <rect height="9.2604" width="2.6458" y="166.03" x="55.562" fill="#0972a5"/>
+    <path d="m160 627.52v10h25v25h10v-35h-10z" transform="scale(.26458)" fill="#0972a5"/>
+    <path d="m410 437.52v40h-50v35h50v15h-50v10h50v15h-50v10h50v15h-50v50h-100v10h110v-50h50v-85h-50v-15h50v-50z" transform="scale(.26458)" fill="#71a865"/>
+    <g fill="#0972a5">
+      <path d="m385 602.52v50h-125v10h135v-50h15v25h10v-35h-25z" transform="scale(.26458)"/>
+      <path d="m385 402.52v50h-25v10h35v-60z" transform="scale(.26458)"/>
+      <rect height="9.2604" width="2.6458" y="106.5" x="95.25"/>
+    </g>
+  </g>
+</svg>
