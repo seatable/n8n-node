@@ -22,3 +22,34 @@ After installing the node, you can use it like any other node. n8n displays the 
 ## License
 
 [MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+
+## Local development
+
+Read more at https://docs.n8n.io/integrations/creating-nodes/build/declarative-style-node/#test-your-node.
+
+Here is the summary:
+
+1. Install n8n globally on your PC with `npm install n8n -g`
+2. Clone or download this repository and save it anywhere
+3. In this downloaded folder run:
+
+```
+npm install
+npm run build
+npm link
+```
+
+4. Now install this node in your local n8n instance
+
+```
+cd ~/.n8n/nodes
+npm link seatable-n8n-nodes-seatable
+```
+
+5. Start the local development area. You need two consoles:
+
+```
+# in the node directory execute this, that after every change the dist directory is updated
+npm run dev
+n8n start
+```
