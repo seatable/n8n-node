@@ -2,20 +2,26 @@
 
 ![n8n.io - Workflow Automation](https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-logo.png)
 
+This repository is the basis for the creation of the SeaTable n8n community node available at https://www.npmjs.com/package/n8n-nodes-seatable. This community node always contains the latest updates and fixes.
+Every change will also be merged into the main product n8n, but sometimes it takes time before the pull requests are accepted.
+
+## About this node
+
 This SeaTable node allows you to automate work in Seatable, and integrate SeaTable with other applications. n8n has built-in support for a wide range of SeaTable features, including creating, reading, listing, updating and deleting entries in a SeaTable base.
 
-## How to install
+## How to use SeaTable in n8n
 
 n8n is shipped with a SeaTable node. Therefore an installation is usually not required.
 You can install this community node, if you want to test newest features, that might not be available with the version shipped with n8n.
 
-### Community Nodes (Recommended)
+### Installation of a this community node
 
+1. Open your n8n server.
 1. Go to **Settings > Community Nodes**.
-2. Select **Install**.
-3. Enter `n8n-nodes-seatable` in **Enter npm package name**.
-4. Agree to the [risks](https://docs.n8n.io/integrations/community-nodes/risks/) of using community nodes: select **I understand the risks of installing unverified code from a public source**.
-5. Select **Install**.
+1. Select **Install**.
+1. Enter `n8n-nodes-seatable` in **Enter npm package name**.
+1. Agree to the [risks](https://docs.n8n.io/integrations/community-nodes/risks/) of using community nodes: select **I understand the risks of installing unverified code from a public source**.
+1. Select **Install**.
 
 After installing the node, you can use it like any other node. n8n displays the node in search results in the **Nodes** panel.
 
