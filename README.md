@@ -43,7 +43,7 @@ npm link
 
 ```
 cd ~/.n8n/nodes
-npm link seatable-n8n-nodes-seatable
+npm link n8n-nodes-seatable
 ```
 
 5. Start the local development area. You need two consoles:
