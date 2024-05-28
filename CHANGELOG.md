@@ -1,5 +1,9 @@
 # Changelog
 
+## Released (2024-05-28 1.5.2)
+
+Fix error in upload action, if server domain ends with '/'
+
 ## Released (2024-01-29 1.5.1)
 
 Minor fix for old version 1
