@@ -1,6 +1,6 @@
 # Changelog
 
-## Released (2024-06-13 1.5.3)
+## Released (2024-06-13 1.5.4)
 
 Asset upload: fix edge cases
 
