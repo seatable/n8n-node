@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-seatable",
-	"version": "1.5.2",
+	"version": "1.5.3",
 	"description": "SeaTable n8n app to interact with any SeaTable Server.",
 	"keywords": [
 		"n8n-community-node-package"

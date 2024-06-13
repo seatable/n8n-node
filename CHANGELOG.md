@@ -1,5 +1,9 @@
 # Changelog
 
+## Released (2024-06-13 1.5.3)
+
+Asset upload: fix edge cases
+
 ## Released (2024-05-28 1.5.2)
 
 Fix error in upload action, if server domain ends with '/'
