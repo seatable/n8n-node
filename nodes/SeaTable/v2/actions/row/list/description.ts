@@ -9,7 +9,7 @@ export const rowListDescription: RowProperties = [
 		placeholder: 'Select a table',
 		required: true,
 		typeOptions: {
-			loadOptionsMethod: 'getTableNames',
+			loadOptionsMethod: 'getTableNameAndId',
 		},
 		displayOptions: {
 			show: {
@@ -20,7 +20,7 @@ export const rowListDescription: RowProperties = [
 		default: '',
 		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
 		description:
-			'The name of SeaTable table to access. Choose from the list, or specify a name using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+			'Choose from the list, or specify by using an expression. Provide it in the way "table_name:::table_id".',
 	},
 	{
 		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
@@ -40,7 +40,7 @@ export const rowListDescription: RowProperties = [
 		default: '',
 		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
 		description:
-			'The name of SeaTable view to access. Choose from the list, or specify a name using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+			'The name of SeaTable view to access, or specify by using an expression. Provide it in the way "col.name:::col.type".',
 	},
 	{
 		displayName: 'Simplify',

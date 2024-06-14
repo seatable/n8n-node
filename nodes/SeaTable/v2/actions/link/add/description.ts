@@ -20,7 +20,7 @@ export const linkAddDescription: LinkProperties = [
 		default: '',
 		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
 		description:
-			'Choose from the list, of specify by using an expression. Provide it in the way "&lt;table_name&gt;:::&lt;table_id&gt;".',
+			'Choose from the list, of specify by using an expression. Provide it in the way "table_name:::table_id".',
 	},
 	{
 		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
@@ -39,8 +39,9 @@ export const linkAddDescription: LinkProperties = [
 		},
 		required: true,
 		default: '',
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
 		description:
-			'If you use an expression, provide it in the way "&lt;column_name&gt;:::&lt;link_id&gt;:::&lt;other_table_id&gt;". Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+			'Choose from the list of specify the Link Column by using an expression. You have to provide it in the way "column_name:::link_id:::other_table_id".',
 	},
 	{
 		displayName: 'Row ID From the Source Table',
