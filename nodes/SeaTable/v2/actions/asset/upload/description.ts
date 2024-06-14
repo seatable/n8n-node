@@ -2,6 +2,7 @@ import type { AssetProperties } from '../../Interfaces';
 
 export const assetUploadDescription: AssetProperties = [
 	{
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
 		displayName: 'Table Name',
 		name: 'tableName',
 		type: 'options',
@@ -18,10 +19,11 @@ export const assetUploadDescription: AssetProperties = [
 		},
 		default: '',
 		description:
-			'The name of SeaTable table to access. Choose from the list, or specify a name using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+			'The name of SeaTable table to access. Choose from the list, or specify a name using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 	},
 	{
-		displayName: 'Column',
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+		displayName: 'Column Name',
 		name: 'uploadColumn',
 		type: 'options',
 		displayOptions: {
@@ -36,12 +38,16 @@ export const assetUploadDescription: AssetProperties = [
 		},
 		required: true,
 		default: '',
-		description: 'Select the column for the upload.',
+		description:
+			'Select the column for the upload. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 	},
 	{
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
 		displayName: 'Row ID',
 		name: 'rowId',
 		type: 'options',
+		description:
+			'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
 		required: true,
 		typeOptions: {
 			loadOptionsDependsOn: ['tableName'],
@@ -70,7 +76,7 @@ export const assetUploadDescription: AssetProperties = [
 		description: 'Name of the binary property which contains the data for the file to be written',
 	},
 	{
-		displayName: 'Replace existing file',
+		displayName: 'Replace Existing File',
 		name: 'replace',
 		type: 'boolean',
 		default: true,
@@ -81,10 +87,10 @@ export const assetUploadDescription: AssetProperties = [
 			},
 		},
 		description:
-			'Replace existing asset with the same name. Otherwise a new version with another name (numeral in parentheses) will be uploaded.',
+			'Whether to replace the existing asset with the same name (true). Otherwise, a new version with a different name (numeral in parentheses) will be uploaded (false).',
 	},
 	{
-		displayName: 'Append to column',
+		displayName: 'Append to Column',
 		name: 'append',
 		type: 'boolean',
 		default: true,
@@ -95,6 +101,6 @@ export const assetUploadDescription: AssetProperties = [
 			},
 		},
 		description:
-			'Keep existing files/images in the column and append the new asset. Otherwise the existing files/images are remove from the column.',
+			'Whether to keep existing files/images in the column and append the new asset (true). Otherwise, the existing files/images are removed from the column (false).',
 	},
 ];

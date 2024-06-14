@@ -2,7 +2,8 @@ import type { LinkProperties } from '../../Interfaces';
 
 export const linkRemoveDescription: LinkProperties = [
 	{
-		displayName: 'Table Name (Source)',
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+		displayName: 'Table (Source)',
 		name: 'tableName',
 		type: 'options',
 		placeholder: 'Name of table',
@@ -17,10 +18,13 @@ export const linkRemoveDescription: LinkProperties = [
 			},
 		},
 		default: '',
-		description: 'If you use an expression, provide it in the way "<table_name>:::<table_id>".',
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
+		description:
+			'Choose from the list or specify the Table Name by using an expression. You have to provide it in the way "table_name:::table_id".',
 	},
 	{
-		displayName: 'Link column',
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+		displayName: 'Link Column',
 		name: 'linkColumn',
 		type: 'options',
 		displayOptions: {
@@ -35,10 +39,12 @@ export const linkRemoveDescription: LinkProperties = [
 		},
 		required: true,
 		default: '',
-		description: 'If you use an expression, provide it in the way "<column_name>:::<link_id>:::<other_table_id>".',
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
+		description:
+			'Choose from the list of specify the Link Column by using an expression. You have to provide it in the way "column_name:::link_id:::other_table_id".',
 	},
 	{
-		displayName: 'Row ID from the source table',
+		displayName: 'Row ID From the Source Table',
 		name: 'linkColumnSourceId',
 		type: 'string',
 		displayOptions: {
@@ -49,10 +55,10 @@ export const linkRemoveDescription: LinkProperties = [
 		},
 		required: true,
 		default: '',
-		description: 'Provide the row ID of table you selected.',
+		description: 'Provide the row ID of table you selected',
 	},
 	{
-		displayName: 'Row ID from the target',
+		displayName: 'Row ID From the Target Table',
 		name: 'linkColumnTargetId',
 		type: 'string',
 		displayOptions: {
@@ -63,6 +69,6 @@ export const linkRemoveDescription: LinkProperties = [
 		},
 		required: true,
 		default: '',
-		description: 'Provide the row ID of table you want to link.',
+		description: 'Provide the row ID of table you want to link',
 	},
 ];

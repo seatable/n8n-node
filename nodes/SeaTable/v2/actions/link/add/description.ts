@@ -2,6 +2,7 @@ import type { LinkProperties } from '../../Interfaces';
 
 export const linkAddDescription: LinkProperties = [
 	{
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
 		displayName: 'Table Name (Source)',
 		name: 'tableName',
 		type: 'options',
@@ -17,10 +18,13 @@ export const linkAddDescription: LinkProperties = [
 			},
 		},
 		default: '',
-		description: 'If you use an expression, provide it in the way "<table_name>:::<table_id>".',
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
+		description:
+			'Choose from the list, of specify by using an expression. Provide it in the way "&lt;table_name&gt;:::&lt;table_id&gt;".',
 	},
 	{
-		displayName: 'Link column',
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+		displayName: 'Link Column',
 		name: 'linkColumn',
 		type: 'options',
 		displayOptions: {
@@ -36,10 +40,10 @@ export const linkAddDescription: LinkProperties = [
 		required: true,
 		default: '',
 		description:
-			'If you use an expression, provide it in the way "<column_name>:::<link_id>:::<other_table_id>".',
+			'If you use an expression, provide it in the way "&lt;column_name&gt;:::&lt;link_id&gt;:::&lt;other_table_id&gt;". Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 	},
 	{
-		displayName: 'Row ID from the source table',
+		displayName: 'Row ID From the Source Table',
 		name: 'linkColumnSourceId',
 		type: 'string',
 		displayOptions: {
@@ -50,10 +54,10 @@ export const linkAddDescription: LinkProperties = [
 		},
 		required: true,
 		default: '',
-		description: 'Provide the row ID of table you selected.',
+		description: 'Provide the row ID of table you selected',
 	},
 	{
-		displayName: 'Row ID from the target',
+		displayName: 'Row ID From the Target',
 		name: 'linkColumnTargetId',
 		type: 'string',
 		displayOptions: {
@@ -64,6 +68,6 @@ export const linkAddDescription: LinkProperties = [
 		},
 		required: true,
 		default: '',
-		description: 'Provide the row ID of table you want to link.',
+		description: 'Provide the row ID of table you want to link',
 	},
 ];
