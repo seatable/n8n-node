@@ -25,25 +25,25 @@ export const descriptions: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				description: 'Create a new row',
+				description: 'Create a new row in normal or big data backend',
 				action: 'Create a row',
 			},
 			{
 				name: 'Delete',
 				value: 'remove',
-				description: 'Delete a row',
+				description: 'Delete a row from normal or big data backend',
 				action: 'Delete a row',
 			},
 			{
 				name: 'Get',
 				value: 'get',
-				description: 'Get the content of a row',
+				description: 'Get the content of a row from normal or big data backend',
 				action: 'Get a row',
 			},
 			{
 				name: 'Get Many',
 				value: 'list',
-				description: 'Get many rows from a table of view',
+				description: 'Get many rows from a table or a table view',
 				action: 'Get many rows',
 			},
 			{
