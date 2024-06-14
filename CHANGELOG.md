@@ -2,7 +2,8 @@
 
 ## Released (2024-06-14 1.6.0)
 
-Fixed all linting errors
+- Fixed all linting errors
+- New action: get row links
 
 ## Released (2024-06-13 1.5.4)
 
