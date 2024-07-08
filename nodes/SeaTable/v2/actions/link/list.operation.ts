@@ -10,7 +10,7 @@ import { seaTableApiRequest } from '../../GenericFunctions';
 export const properties: INodeProperties[] = [
 	{
 		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
-		displayName: 'Table Name 32',
+		displayName: 'Table Name',
 		name: 'tableName',
 		type: 'options',
 		placeholder: 'Select a table',
