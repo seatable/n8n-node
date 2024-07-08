@@ -1,5 +1,9 @@
 # Changelog
 
+## Released (2024-07-08 1.6.1)
+
+- Rebuild actions to new structure
+
 ## Released (2024-06-14 1.6.0)
 
 - Fixed all linting errors

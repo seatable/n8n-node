@@ -52,6 +52,18 @@ export const properties: INodeProperties[] = [
 		description: 'Whether to insert the input data this node receives in the new row',
 	},
 	{
+		displayName:
+			'In this mode, make sure the incoming data fields are named the same as the columns in SeaTable. (Use an "Edit Fields" node before this node to change them if required.)',
+		name: 'notice',
+		type: 'notice',
+		default: '',
+		displayOptions: {
+			show: {
+				'/fieldsToSend': ['autoMapInputData'],
+			},
+		},
+	},
+	{
 		displayName: 'Inputs to Ignore',
 		name: 'inputsToIgnore',
 		type: 'string',
@@ -59,6 +71,11 @@ export const properties: INodeProperties[] = [
 		description:
 			'List of input properties to avoid sending, separated by commas. Leave empty to send all properties.',
 		placeholder: 'Enter properties...',
+		displayOptions: {
+			show: {
+				'/fieldsToSend': ['autoMapInputData'],
+			},
+		},
 	},
 	{
 		displayName: 'Columns to Send',
@@ -68,6 +85,11 @@ export const properties: INodeProperties[] = [
 		typeOptions: {
 			multipleValueButtonText: 'Add Column to Send',
 			multipleValues: true,
+		},
+		displayOptions: {
+			show: {
+				'/fieldsToSend': ['defineBelow'],
+			},
 		},
 		options: [
 			{
@@ -110,7 +132,8 @@ export const properties: INodeProperties[] = [
 			'Whether write to Big Data backend (true) or not (false). True requires the activation of the Big Data backend in the base.',
 	},
 	{
-		displayName: 'Hint: Link, files, images or digital signatures have to be added separately.',
+		displayName:
+			'Hint: Link, files, images or digital signatures have to be added separately. These column types cannot be set with this node.',
 		name: 'notice',
 		type: 'notice',
 		default: '',
