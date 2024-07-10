@@ -1,6 +1,6 @@
 # Changelog
 
-## Released (2024-07-08 1.6.1)
+## Released (2024-07-08 1.6.2)
 
 - Rebuild actions to new structure
 
