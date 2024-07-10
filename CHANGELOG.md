@@ -1,5 +1,9 @@
 # Changelog
 
+## Released (2024-07-10 1.6.3)
+
+- fix loadOptions of action ListRows
+
 ## Released (2024-07-08 1.6.2)
 
 - Rebuild actions to new structure
