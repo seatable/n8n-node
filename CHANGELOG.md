@@ -1,8 +1,12 @@
 # Changelog
 
+## Released (2024-08-16 1.6.4)
+
+- Fixed: Date input values in the `create row` operation were incorrectly transformed
+
 ## Released (2024-07-10 1.6.3)
 
-- fix loadOptions of action ListRows
+- Fixed: loadOptions of action ListRows
 
 ## Released (2024-07-08 1.6.2)
 
