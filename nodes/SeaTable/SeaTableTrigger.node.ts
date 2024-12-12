@@ -127,6 +127,18 @@ export class SeaTableTrigger implements INodeType {
 					'Whether to return a simplified version of the response instead of the raw data',
 			},
 			{
+				displayName: 'Return Column Names',
+				name: 'convert',
+				type: 'boolean',
+				default: true,
+				description: 'Whether to return the column keys (false) or the column names (true)',
+				displayOptions: {
+					show: {
+						event: ['newRow', 'updatedRow'],
+					},
+				},
+			},
+			{
 				displayName: '"Fetch Test Event" returns max. three items of the last hour.',
 				name: 'notice',
 				type: 'notice',
@@ -146,6 +158,7 @@ export class SeaTableTrigger implements INodeType {
 			event === 'newAsset' ? this.getNodeParameter('assetColumn') : ''
 		) as string;
 		const simple = this.getNodeParameter('simple') as boolean;
+		const convert = this.getNodeParameter('convert', true) as boolean;
 
 		const ctx: ICtx = {};
 
@@ -170,7 +183,7 @@ export class SeaTableTrigger implements INodeType {
 			const endpoint = '/api-gateway/api/v2/dtables/{{dtable_uuid}}/sql';
 			sqlResult = await seaTableApiRequest.call(this, ctx, 'POST', endpoint, {
 				sql: `SELECT _id, _ctime, _mtime, \`${assetColumn}\` FROM ${tableName} WHERE \`${assetColumn}\` IS NOT NULL ORDER BY _mtime DESC LIMIT ${limit}`,
-				convert_keys: true,
+				convert_keys: convert,
 			});
 
 			metadata = sqlResult.metadata as IDtableMetadataColumn[];
@@ -212,7 +225,7 @@ export class SeaTableTrigger implements INodeType {
 					table_name: tableName,
 					view_name: viewName,
 					limit,
-					convert_keys: true,
+					convert_keys: convert,
 				},
 			);
 
@@ -234,7 +247,7 @@ export class SeaTableTrigger implements INodeType {
 			)}" ORDER BY ${filterField} DESC LIMIT ${limit}`;
 			sqlResult = await seaTableApiRequest.call(this, ctx, 'POST', endpoint, {
 				sql: sqlQuery,
-				convert_keys: true,
+				convert_keys: convert,
 			});
 			metadata = sqlResult.metadata as IDtableMetadataColumn[];
 			rows = sqlResult.results;
