@@ -193,13 +193,3 @@ export interface IUploadLink {
 	img_relative_path: string;
 	file_relative_path: string;
 }
-
-export interface RowUpdate {
-	row_id: string;
-	row: Record<string, any>;
-}
-
-export interface RowUpdateBody {
-	table_name: string;
-	updates: RowUpdate[];
-}
