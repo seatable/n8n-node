@@ -73,15 +73,17 @@ export async function execute(
 	const linkColumn = this.getNodeParameter('linkColumn', index) as string;
 	const rowId = this.getNodeParameter('rowId', index) as string;
 
+	console.log(linkColumn);
+
 	// get rows
 	const responseData = await seaTableApiRequest.call(
 		this,
 		{},
 		'POST',
-		'/dtable-db/api/v1/linked-records/{{dtable_uuid}}/',
+		'/api-gateway/api/v2/dtables/{{dtable_uuid}}/query-links/',
 		{
 			table_id: tableName.split(':::')[1],
-			link_column: linkColumn.split(':::')[3],
+			link_column_key: linkColumn.split(':::')[3],
 			rows: [
 				{
 					row_id: rowId,
@@ -91,5 +93,5 @@ export async function execute(
 			],
 		},
 	);
-	return this.helpers.returnJsonArray(responseData[rowId] as IDataObject[]);
+	return this.helpers.returnJsonArray(responseData as IDataObject[]);
 }
