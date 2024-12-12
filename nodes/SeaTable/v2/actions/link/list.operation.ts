@@ -73,8 +73,6 @@ export async function execute(
 	const linkColumn = this.getNodeParameter('linkColumn', index) as string;
 	const rowId = this.getNodeParameter('rowId', index) as string;
 
-	console.log(linkColumn);
-
 	// get rows
 	const responseData = await seaTableApiRequest.call(
 		this,
