@@ -167,7 +167,7 @@ export class SeaTableTrigger implements INodeType {
 
 		// New Signature
 		if (event === 'newAsset') {
-			const endpoint = '/dtable-db/api/v1/query/{{dtable_uuid}}/';
+			const endpoint = '/api-gateway/api/v2/dtables/{{dtable_uuid}}/sql';
 			sqlResult = await seaTableApiRequest.call(this, ctx, 'POST', endpoint, {
 				sql: `SELECT _id, _ctime, _mtime, \`${assetColumn}\` FROM ${tableName} WHERE \`${assetColumn}\` IS NOT NULL ORDER BY _mtime DESC LIMIT ${limit}`,
 				convert_keys: true,
@@ -200,18 +200,19 @@ export class SeaTableTrigger implements INodeType {
 				this,
 				ctx,
 				'GET',
-				'/dtable-server/api/v1/dtables/{{dtable_uuid}}/metadata/',
+				'/api-gateway/api/v2/dtables/{{dtable_uuid}}/metadata/',
 			);
 			requestRows = await seaTableApiRequest.call(
 				this,
 				ctx,
 				'GET',
-				'/dtable-server/api/v1/dtables/{{dtable_uuid}}/rows/',
+				'/api-gateway/api/v2/dtables/{{dtable_uuid}}/rows/',
 				{},
 				{
 					table_name: tableName,
 					view_name: viewName,
 					limit,
+					convert_keys: true,
 				},
 			);
 
@@ -225,7 +226,7 @@ export class SeaTableTrigger implements INodeType {
 				rows = requestRows.rows.filter((obj) => new Date(obj[filterField]) > new Date(startDate));
 			}
 		} else {
-			const endpoint = '/dtable-db/api/v1/query/{{dtable_uuid}}/';
+			const endpoint = '/api-gateway/api/v2/dtables/{{dtable_uuid}}/sql';
 			const sqlQuery = `SELECT * FROM \`${tableName}\` WHERE ${filterField} BETWEEN "${moment(
 				startDate,
 			).format('YYYY-MM-D HH:mm:ss')}" AND "${moment(endDate).format(
@@ -243,7 +244,7 @@ export class SeaTableTrigger implements INodeType {
 			this,
 			ctx,
 			'GET',
-			'/dtable-server/api/v1/dtables/{{dtable_uuid}}/related-users/',
+			'/api-gateway/api/v2/dtables/{{dtable_uuid}}/related-users/',
 		);
 		const collaborators: ICollaborator[] = collaboratorsResult.user_list || [];
 
