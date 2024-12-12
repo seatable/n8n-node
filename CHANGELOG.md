@@ -1,5 +1,11 @@
 # Changelog
 
+## Released (2024-12-12 2.0.1)
+
+- All dtable-db and dtable-server endpoints were replaced with api-gateway
+- Added new convert options to some actions
+- Lint fixes for merge into n8n-core
+
 ## Released (2024-08-16 1.6.4)
 
 - Fixed: Date input values in the `create row` operation were incorrectly transformed
