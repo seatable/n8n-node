@@ -38,6 +38,9 @@
 		]
 	},
 	"devDependencies": {
+		"@types/form-data": "^2.2.1",
+		"@types/moment-timezone": "^0.5.13",
+		"@types/node": "^22.10.2",
 		"@typescript-eslint/parser": "^7.15.0",
 		"eslint": "^8.56.0",
 		"eslint-plugin-n8n-nodes-base": "^1.16.1",
@@ -45,5 +48,9 @@
 		"n8n-workflow": "*",
 		"prettier": "^3.3.2",
 		"typescript": "^5.5.3"
+	},
+	"dependencies": {
+		"form-data": "^4.0.1",
+		"moment-timezone": "^0.5.46"
 	}
 }
