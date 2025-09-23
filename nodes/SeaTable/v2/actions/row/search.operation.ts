@@ -70,6 +70,14 @@ export const properties: INodeProperties[] = [
 			'Whether the search only results perfect matches (true). Otherwise, it finds a row even if the search value is part of a string (false).',
 	},
 	{
+		displayName: 'Return All',
+		name: 'returnAll',
+		type: 'boolean',
+		default: true,
+		description: 
+			'Whether to return every rows in the response (the request returns a maximum of 10 000 rows, even if more rows are available). If not checked, the 100 first rows will be returned.',
+	},
+	{
 		displayName: 'Simplify',
 		name: 'simple',
 		type: 'boolean',
@@ -104,6 +112,7 @@ export async function execute(
 	let searchTermString = String(searchTerm);
 	const insensitive = this.getNodeParameter('insensitive', index) as boolean;
 	const wildcard = this.getNodeParameter('wildcard', index) as boolean;
+	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const simple = this.getNodeParameter('simple', index) as boolean;
 	const convert = this.getNodeParameter('convert', index) as boolean;
 
@@ -120,6 +129,8 @@ export async function execute(
 
 	if (wildcard) sqlQuery = sqlQuery + ' LIKE "%' + searchTermString + '%"';
 	else if (!wildcard) sqlQuery = sqlQuery + ' = "' + searchTermString + '"';
+
+	if (returnAll) sqlQuery = sqlQuery + ' LIMIT 10000';
 
 	const sqlResult = (await seaTableApiRequest.call(
 		this,
