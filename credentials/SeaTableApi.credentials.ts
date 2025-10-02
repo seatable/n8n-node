@@ -45,6 +45,21 @@ export class SeaTableApi implements ICredentialType {
 		},
 	];
 
+	/* 
+	Can not be used like that to add SeaTable API to the HTTP-Request node as predefined authentication.
+	Reason: this will try to use the API-token and not the needed base token. Therefore, this does not work and could not be added!
+	Leave this comment as documentation!
+
+	authenticate: IAuthenticateGeneric = {
+		type: 'generic',
+		properties: {
+			headers: {
+			Authorization: '={{"Token " + $credentials.token}}',
+			},
+		},
+	};
+	*/
+
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials?.domain || "https://cloud.seatable.io" }}',

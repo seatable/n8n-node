@@ -59,3 +59,7 @@ npm link n8n-nodes-seatable
 npm run dev
 n8n start
 ```
+
+## Changelog
+
+Link to [CHANGELOG.md](https://github.com/seatable/n8n-node/blob/master/CHANGELOG.md)

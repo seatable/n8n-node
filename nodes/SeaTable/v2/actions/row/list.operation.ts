@@ -12,7 +12,7 @@ import {
 	simplify_new,
 	getBaseCollaborators,
 } from '../../GenericFunctions';
-import type { IRow } from '../Interfaces';
+import type { IDtableMetadataColumn, IRow } from '../Interfaces';
 
 export const properties: INodeProperties[] = [
 	{
@@ -43,6 +43,31 @@ export const properties: INodeProperties[] = [
 		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-options
 		description:
 			'The name of SeaTable view to access, or specify by using an expression. Provide it in the way "col.name:::col.type".',
+	},
+	{
+		displayName: 'Return All',
+		name: 'returnAll',
+		type: 'boolean',
+		default: true,
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-return-all
+		description: 'Whether to return all results or only up to a given limit',
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		displayOptions: {
+			show: {
+				returnAll: [false],
+			},
+		},
+		typeOptions: {
+			minValue: 1,
+			// eslint-disable-next-line n8n-nodes-base/node-param-type-options-max-value-present
+			maxValue: 1000,
+		},
+		default: 50,
+		description: 'Max number of results to return',
 	},
 	{
 		displayName: 'Simplify',
@@ -76,6 +101,7 @@ export async function execute(
 	// get parameters
 	const tableName = this.getNodeParameter('tableName', index) as string;
 	const viewName = this.getNodeParameter('viewName', index) as string;
+	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const simple = this.getNodeParameter('simple', index) as boolean;
 	const convert = this.getNodeParameter('convert', index) as boolean;
 
@@ -90,24 +116,67 @@ export async function execute(
 		'/api-gateway/api/v2/dtables/{{dtable_uuid}}/metadata/',
 	);
 
-	const requestRows = await seaTableApiRequest.call(
-		this,
-		{},
-		'GET',
-		'/api-gateway/api/v2/dtables/{{dtable_uuid}}/rows/',
-		{},
-		{
-			table_name: tableName,
-			view_name: viewName,
-			limit: 1000,
-			convert_keys: convert,
-		},
-	);
+	let metadata: IDtableMetadataColumn[] = [];
+	let rows: IRow[] = [];
 
-	const metadata =
-		requestMeta.metadata.tables.find((table: { name: string }) => table.name === tableName)
-			?.columns ?? [];
-	const rows = requestRows.rows as IRow[];
+	if (returnAll) {
+
+		const batchSize = 1000;
+		let offset = 0;
+		let fetchMore = true;
+
+		// Fetch rows in batches until no more rows come back
+		do {
+			const requestRows = await seaTableApiRequest.call(
+				this,
+				{},
+				'GET',
+				'/api-gateway/api/v2/dtables/{{dtable_uuid}}/rows/',
+				{},
+				{
+					table_name: tableName,
+					view_name: viewName,
+					limit: batchSize,
+					start: offset,
+					convert_keys: convert,
+				},
+			);
+
+			// On first batch, grab metadata columns for the table
+			if (!metadata.length) {
+				metadata =
+					requestMeta.metadata.tables.find((table: { name: string }) => table.name === tableName)
+						?.columns ?? [];
+			}
+
+			rows = rows.concat(requestRows.rows as IRow[]);
+
+			offset += batchSize;
+			fetchMore = (requestRows.rows as IRow[]).length === batchSize;
+
+		} while (fetchMore);
+
+	} else {
+		const limit = this.getNodeParameter('limit', index) as number;
+		const requestRows = await seaTableApiRequest.call(
+			this,
+			{},
+			'GET',
+			'/api-gateway/api/v2/dtables/{{dtable_uuid}}/rows/',
+			{},
+			{
+				table_name: tableName,
+				view_name: viewName,
+				limit: limit,
+				convert_keys: convert,
+			},
+		);
+
+		metadata =
+			requestMeta.metadata.tables.find((table: { name: string }) => table.name === tableName)
+				?.columns ?? [];
+		rows = requestRows.rows as IRow[];
+	}
 
 	// hide columns like button
 	rows.map((row) => enrichColumns(row, metadata, collaborators));

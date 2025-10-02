@@ -12,7 +12,7 @@ import {
 	simplify_new,
 	getBaseCollaborators,
 } from '../../GenericFunctions';
-import type { IDtableMetadataColumn, IRowResponse } from '../Interfaces';
+import type { IRow, IDtableMetadataColumn, IRowResponse } from '../Interfaces';
 
 export const properties: INodeProperties[] = [
 	{
@@ -74,8 +74,25 @@ export const properties: INodeProperties[] = [
 		name: 'returnAll',
 		type: 'boolean',
 		default: true,
-		description: 
-			'Whether to return every rows in the response (the request returns a maximum of 10 000 rows, even if more rows are available). If not checked, the 100 first rows will be returned.',
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-return-all
+		description: 'Whether to return all results or only up to a given limit',
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		displayOptions: {
+			show: {
+				returnAll: [false],
+			},
+		},
+		typeOptions: {
+			minValue: 1,
+			// eslint-disable-next-line n8n-nodes-base/node-param-type-options-max-value-present
+			maxValue: 10000,
+		},
+		default: 50,
+		description: 'Max number of results to return',
 	},
 	{
 		displayName: 'Simplify',
@@ -130,20 +147,58 @@ export async function execute(
 	if (wildcard) sqlQuery = sqlQuery + ' LIKE "%' + searchTermString + '%"';
 	else if (!wildcard) sqlQuery = sqlQuery + ' = "' + searchTermString + '"';
 
-	if (returnAll) sqlQuery = sqlQuery + ' LIMIT 10000';
+	let metadata: IDtableMetadataColumn[] = [];
+	let rows: IRow[] = [];
 
-	const sqlResult = (await seaTableApiRequest.call(
-		this,
-		{},
-		'POST',
-		'/api-gateway/api/v2/dtables/{{dtable_uuid}}/sql',
-		{
-			sql: sqlQuery,
-			convert_keys: convert,
-		},
-	)) as IRowResponse;
-	const metadata = sqlResult.metadata as IDtableMetadataColumn[];
-	const rows = sqlResult.results;
+	if (returnAll) {
+		const batchSize = 10000;
+		let offset = 0;
+		let fetchMore = true;
+
+		do {
+			const sqlQueryWithPagination = sqlQuery + ` LIMIT ${batchSize} OFFSET ${offset}`;
+			const sqlResult = await seaTableApiRequest.call(
+				this,
+				{},
+				'POST',
+				'/api-gateway/api/v2/dtables/{{dtable_uuid}}/sql',
+				{
+					sql: sqlQueryWithPagination,
+					convert_keys: convert,
+				},
+			) as IRowResponse;
+
+			// Populate metadata from first fetch
+			if (!metadata.length) {
+				metadata = sqlResult.metadata as IDtableMetadataColumn[];
+			}
+			// Concatenate results
+			rows = rows.concat(sqlResult.results);
+
+			offset += batchSize;
+			// Continue if fetched full batch
+			fetchMore = sqlResult.results.length === batchSize;
+
+		} while (fetchMore);
+
+	} else {
+		const limit = this.getNodeParameter('limit', index) as number;
+		sqlQuery = sqlQuery + ` LIMIT ${limit}`;
+
+		const sqlResult = (await seaTableApiRequest.call(
+			this,
+			{},
+			'POST',
+			'/api-gateway/api/v2/dtables/{{dtable_uuid}}/sql',
+			{
+				sql: sqlQuery,
+				convert_keys: convert,
+			},
+		)) as IRowResponse;
+
+		metadata = sqlResult.metadata as IDtableMetadataColumn[];
+		rows = sqlResult.results;
+	}
 
 	// hide columns like button
 	rows.map((row) => enrichColumns(row, metadata, collaborators));

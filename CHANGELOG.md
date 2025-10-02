@@ -1,5 +1,11 @@
 # Changelog
 
+## Released (2025-10-02 2.1.0)
+
+- Asset Upload: urlencode the filename during row update
+- Row Search: New option "return all"
+- Row Get Many: New option "return all"
+
 ## Released (2024-12-12 2.0.1)
 
 - All dtable-db and dtable-server endpoints were replaced with api-gateway

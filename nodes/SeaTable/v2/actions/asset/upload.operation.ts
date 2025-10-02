@@ -177,7 +177,7 @@ export async function execute(
 	// attach the asset to a column in a base
 	for (let c = 0; c < uploadAsset.length; c++) {
 		const rowInput = {} as IRowObject;
-		const filePath = `${serverURL}/workspace/${workspaceId}${uploadLink.parent_path}/${relativePath}/${uploadAsset[c].name}`;
+		const filePath = `${serverURL}/workspace/${workspaceId}${uploadLink.parent_path}/${relativePath}/${encodeURIComponent(uploadAsset[c].name)}`;
 
 		if (uploadColumnType === 'image') {
 			rowInput[uploadColumnName] = [filePath];
