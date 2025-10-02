@@ -47,37 +47,80 @@ export async function getTableNameAndId(
 export async function getSearchableColumns(
 	this: ILoadOptionsFunctions,
 ): Promise<INodePropertyOptions[]> {
-	const returnData: INodePropertyOptions[] = [];
 	const tableName = this.getCurrentNodeParameter('tableName') as string;
-	if (tableName) {
-		const columns = await seaTableApiRequest.call(
-			this,
-			{},
-			'GET',
-			'/api-gateway/api/v2/dtables/{{dtable_uuid}}/columns',
-			{},
-			{ table_name: tableName },
-		);
-		for (const col of columns.columns) {
-			if (
-				col.type === 'text' ||
-				col.type === 'long-text' ||
-				col.type === 'number' ||
-				col.type === 'single-select' ||
-				col.type === 'email' ||
-				col.type === 'url' ||
-				col.type === 'rate' ||
-				col.type === 'formula'
-			) {
-				returnData.push({
-					name: col.name,
-					value: col.name,
-				});
-			}
+	const returnData: INodePropertyOptions[] = [];
+
+	if (!tableName) return returnData;
+
+	const columns = await seaTableApiRequest.call(
+		this,
+		{},
+		'GET',
+		'/api-gateway/api/v2/dtables/{{dtable_uuid}}/columns',
+		{},
+		{ table_name: tableName }
+	);
+
+	for (const col of columns.columns) {
+		if (['text', 'long-text', 'number', 'single-select', 'email', 'url', 'rate', 'formula', 'checkbox'].includes(col.type))
+		returnData.push({ name: col.name, value: col.name });
+	}
+	return returnData;
+}
+
+export async function getColumnType(
+		this: ILoadOptionsFunctions,
+): Promise<INodePropertyOptions[]> {
+	const tableName = this.getCurrentNodeParameter('tableName') as string;
+	const searchColumn = this.getCurrentNodeParameter('searchColumn') as string;
+	const returnData: INodePropertyOptions[] = [];
+
+	const columns = await seaTableApiRequest.call(
+		this,
+		{},
+		'GET',
+		'/api-gateway/api/v2/dtables/{{dtable_uuid}}/columns',
+		{},
+		{ table_name: tableName }
+	);
+
+	for (const col of columns.columns) {
+		if(col.name === searchColumn){
+			returnData.push({ name: col.type, value: col.type })
 		}
 	}
 	return returnData;
 }
+
+export async function getColumnSelectOptions(
+		this: ILoadOptionsFunctions,
+): Promise<INodePropertyOptions[]> {
+	const tableName = this.getCurrentNodeParameter('tableName') as string;
+	const searchColumn = this.getCurrentNodeParameter('searchColumn') as string;
+	const returnData: INodePropertyOptions[] = [];
+
+	const columns = await seaTableApiRequest.call(
+		this,
+		{},
+		'GET',
+		'/api-gateway/api/v2/dtables/{{dtable_uuid}}/columns',
+		{},
+		{ table_name: tableName }
+	);
+
+	for (const col of columns.columns) {
+		if(col.name === searchColumn && ( col.type === 'single-select' || col.type === 'multiple-select' ) ){
+			for (const o of col.data.options){
+				returnData.push({ name: o.name, value: o.name })
+			}
+			
+		}
+	}
+	return returnData;
+}
+
+
+
 
 export async function getLinkColumns(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 	const returnData: INodePropertyOptions[] = [];

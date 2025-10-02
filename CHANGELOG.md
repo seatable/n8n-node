@@ -3,8 +3,9 @@
 ## Released (2025-10-02 2.1.0)
 
 - Asset Upload: urlencode the filename during row update
-- Row Search: New option "return all"
 - Row Get Many: New option "return all"
+- Row Search: New option "return all"
+- Row Search: Improved search options for various column types
 
 ## Released (2024-12-12 2.0.1)
 

@@ -333,6 +333,23 @@ export function rowExport(row: IRowObject, columns: TDtableMetadataColumns): IRo
 	return rowAllowed;
 }
 
+export function getSqlOperator(condition: string): string {
+  switch (condition) {
+    case 'equal':
+      return '=';
+    case 'greaterEqual':
+      return '>=';
+    case 'greater':
+      return '>';
+    case 'lessEqual':
+      return '<=';
+    case 'less':
+      return '<';
+    default:
+      return '=';
+  }
+}
+
 export const dtableSchemaIsColumn = (column: IDtableMetadataColumn): boolean =>
 	!!schema.columnTypes[column.type];
 

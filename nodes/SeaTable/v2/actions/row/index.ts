@@ -57,7 +57,7 @@ export const descriptions: INodeProperties[] = [
 				name: 'Search',
 				value: 'search',
 				description: 'Search one or multiple rows',
-				action: 'Search a row by keyword',
+				action: 'Search a row',
 			},
 			{
 				name: 'Unlock',

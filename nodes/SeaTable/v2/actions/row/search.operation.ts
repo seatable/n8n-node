@@ -11,6 +11,7 @@ import {
 	enrichColumns,
 	simplify_new,
 	getBaseCollaborators,
+	getSqlOperator
 } from '../../GenericFunctions';
 import type { IRow, IDtableMetadataColumn, IRowResponse } from '../Interfaces';
 
@@ -46,18 +47,50 @@ export const properties: INodeProperties[] = [
 			'Select the column to be searched. Not all column types are supported for search. Choose from the list, or specify a name using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 	},
 	{
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+		displayName: 'Column Type',
+		name: 'searchColumnType',
+		type: 'options',
+		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+		typeOptions: {
+			loadOptionsDependsOn: ['searchColumn'],
+			loadOptionsMethod: 'getColumnType',
+		},
+		required: true,
+		default: '',
+	},
+
+	/**
+	 * Search options for:
+	 * - text
+	 * - long-text
+	 * - email
+	 * - url
+	 * - formula
+	 */
+	{
 		displayName: 'Search Term',
 		name: 'searchTerm',
 		type: 'string',
-		required: true,
 		default: '',
+		required: true,
 		description: 'What to look for?',
+		displayOptions: {
+			show: {
+				searchColumnType: ['text', 'long-text', 'email', 'url', 'formula'],
+			},
+		},
 	},
 	{
 		displayName: 'Case Insensitive Search',
 		name: 'insensitive',
 		type: 'boolean',
 		default: false,
+		displayOptions: {
+			show: {
+				searchColumnType: ['text', 'long-text', 'email', 'url', 'formula'],
+			},
+		},
 		description:
 			'Whether the search ignores case sensitivity (true). Otherwise, it distinguishes between uppercase and lowercase characters.',
 	},
@@ -66,9 +99,136 @@ export const properties: INodeProperties[] = [
 		name: 'wildcard',
 		type: 'boolean',
 		default: false,
+		displayOptions: {
+			show: {
+				searchColumnType: ['text', 'long-text', 'email', 'url', 'formula'],
+			},
+		},
 		description:
 			'Whether the search only results perfect matches (true). Otherwise, it finds a row even if the search value is part of a string (false).',
 	},
+
+	/**
+	 * Search options for:
+	 * - number
+	 */
+	{
+		displayName: 'Search Number',
+		name: 'searchNumber',
+		type: 'number',
+		default: '',
+		required: true,
+		description: 'All number values (percent, dollar, euro, etc.) are stored in decimal notation as xx.yy (e.g., 3.45). Please enter your value using this format.',
+		displayOptions: {
+			show: {
+				searchColumnType: ['number'],
+			},
+		},
+	},
+	{
+		displayName: 'Condition',
+		name: 'numberCondition',
+		type: 'options',
+		options: [
+			{ name: 'Equal', value: 'equal' },
+			{ name: 'Greater or Equal', value: 'greaterEqual' },
+			{ name: 'Greater Than', value: 'greater' },
+			{ name: 'Less or Equal', value: 'lessEqual' },
+			{ name: 'Less Than', value: 'less' },
+		],
+		default: 'equal',
+		displayOptions: {
+			show: {
+				searchColumnType: ['number'],
+			},
+		},
+		description: 'Select how to compare the number value in the search',
+	},
+
+	/**
+	 * Search options for:
+	 * - single-select
+	 */
+	{
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options
+		displayName: 'Search Single-Select Option',
+		name: 'searchTerm',
+		type: 'options',
+		default: '',
+		required: true,
+		typeOptions: {
+			loadOptionsDependsOn: ['searchColumn'],
+			loadOptionsMethod: 'getColumnSelectOptions',
+		},
+		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+		displayOptions: {
+			show: {
+				searchColumnType: ['single-select'],
+			},
+		},
+	},
+
+	/**
+	 * Search options for:
+	 * - rate
+	 */
+	{
+		displayName: 'Rate Value',
+		name: 'searchNumber',
+		type: 'number',
+		typeOptions: {
+			minValue: 1,
+			// eslint-disable-next-line n8n-nodes-base/node-param-type-options-max-value-present
+			maxValue: 10,
+		},
+		default: 3,
+		displayOptions: {
+			show: {
+				searchColumnType: ['rate'],
+			},
+		},
+		description: 'Enter the rate value you are looking for',
+	},
+	{
+		displayName: 'Condition',
+		name: 'numberCondition',
+		type: 'options',
+		options: [
+			{ name: 'Equal', value: 'equal' },
+			{ name: 'Greater or Equal', value: 'greaterEqual' },
+			{ name: 'Greater Than', value: 'greater' },
+			{ name: 'Less or Equal', value: 'lessEqual' },
+			{ name: 'Less Than', value: 'less' },
+		],
+		default: 'equal',
+		displayOptions: {
+			show: {
+				searchColumnType: ['rate'],
+			},
+		},
+		description: 'Select how to compare the rate value in the search',
+	},
+
+	/**
+	 * Search options for:
+	 * - checkbox
+	 */
+	{
+		displayName: 'Checkbox Status',
+		name: 'searchCheckboxStatus',
+		type: 'options',
+		default: true,
+		options: [
+			{ name: 'Checked', value: true },
+			{ name: 'Not Checked', value: false },
+		],
+		displayOptions: {
+			show: {
+				searchColumnType: ['checkbox'],
+			},
+		},
+	},
+
 	{
 		displayName: 'Return All',
 		name: 'returnAll',
@@ -107,7 +267,7 @@ export const properties: INodeProperties[] = [
 		type: 'boolean',
 		default: true,
 		description: 'Whether to return the column keys (false) or the column names (true)',
-	},
+	}
 ];
 
 const displayOptions = {
@@ -125,30 +285,61 @@ export async function execute(
 ): Promise<INodeExecutionData[]> {
 	const tableName = this.getNodeParameter('tableName', index) as string;
 	const searchColumn = this.getNodeParameter('searchColumn', index) as string;
-	const searchTerm = this.getNodeParameter('searchTerm', index) as string | number;
-	let searchTermString = String(searchTerm);
-	const insensitive = this.getNodeParameter('insensitive', index) as boolean;
-	const wildcard = this.getNodeParameter('wildcard', index) as boolean;
-	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
-	const simple = this.getNodeParameter('simple', index) as boolean;
-	const convert = this.getNodeParameter('convert', index) as boolean;
+	const searchColumnType = this.getNodeParameter('searchColumnType', index) as string ?? 'text';
 
-	// get collaborators
-	const collaborators = await getBaseCollaborators.call(this);
+	let sqlQuery = "" as any;
 
-	// this is the base query. The WHERE has to be finalized...
-	let sqlQuery = `SELECT * FROM \`${tableName}\` WHERE \`${searchColumn}\``;
+	switch (searchColumnType){
+		case 'checkbox':
+			let searchCheckboxStatus = this.getNodeParameter('searchCheckboxStatus', index, true) as boolean;
 
-	if (insensitive) {
-		searchTermString = searchTermString.toLowerCase();
-		sqlQuery = `SELECT * FROM \`${tableName}\` WHERE lower(\`${searchColumn}\`)`;
+			sqlQuery = `SELECT * FROM \`${tableName}\` WHERE \`${searchColumn}\``;
+			sqlQuery = sqlQuery + ' = ' + searchCheckboxStatus; 
+			
+			break;
+
+		case 'rate':
+		case 'number':
+		
+			let searchNumber = this.getNodeParameter('searchNumber', index, false) as number;
+			let numberCondition = this.getNodeParameter('numberCondition', index, false) as string;
+
+			sqlQuery = `SELECT * FROM \`${tableName}\` WHERE \`${searchColumn}\``;
+			sqlQuery = sqlQuery + ' ' + getSqlOperator(numberCondition) + ' ' + searchNumber;
+
+			break;
+
+		default:
+
+			let searchTerm = this.getNodeParameter('searchTerm', index, false) as string;
+			const insensitive = this.getNodeParameter('insensitive', index, false) as boolean;
+			const wildcard = this.getNodeParameter('wildcard', index, false) as boolean;
+
+			// this is the base query. The WHERE has to be finalized...
+			sqlQuery = `SELECT * FROM \`${tableName}\` WHERE \`${searchColumn}\``;
+
+			if (insensitive) {
+				searchTerm = searchTerm.toLowerCase();
+				sqlQuery = `SELECT * FROM \`${tableName}\` WHERE lower(\`${searchColumn}\`)`;
+			}
+
+			if (wildcard) sqlQuery = sqlQuery + ' LIKE "%' + searchTerm + '%"';
+			else if (!wildcard) sqlQuery = sqlQuery + ' = "' + searchTerm + '"';
+
+			break;
 	}
 
-	if (wildcard) sqlQuery = sqlQuery + ' LIKE "%' + searchTermString + '%"';
-	else if (!wildcard) sqlQuery = sqlQuery + ' = "' + searchTermString + '"';
+	// DEBUGGING:
+	//console.log(sqlQuery);
+
+	// lets get the rows...
 
 	let metadata: IDtableMetadataColumn[] = [];
 	let rows: IRow[] = [];
+
+	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+	const simple = this.getNodeParameter('simple', index) as boolean;
+	const convert = this.getNodeParameter('convert', index) as boolean;
 
 	if (returnAll) {
 		const batchSize = 10000;
@@ -199,6 +390,9 @@ export async function execute(
 		metadata = sqlResult.metadata as IDtableMetadataColumn[];
 		rows = sqlResult.results;
 	}
+
+	// get collaborators
+	const collaborators = await getBaseCollaborators.call(this);
 
 	// hide columns like button
 	rows.map((row) => enrichColumns(row, metadata, collaborators));
