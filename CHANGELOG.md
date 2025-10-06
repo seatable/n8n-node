@@ -1,5 +1,9 @@
 # Changelog
 
+## Released (2025-10-06 2.1.1)
+
+- New grayscale logo for "community node" for better differentiation
+
 ## Released (2025-10-02 2.1.0)
 
 - Asset Upload: urlencode the filename during row update

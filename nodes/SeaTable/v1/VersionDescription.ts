@@ -6,7 +6,7 @@ import { rowFields, rowOperations } from './RowDescription';
 export const versionDescription: INodeTypeDescription = {
 	displayName: 'SeaTable',
 	name: 'seaTable',
-	icon: 'file:seaTable.svg',
+	icon: 'file:seaTable-ce.svg',
 	group: ['input'],
 	version: 1,
 	subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
