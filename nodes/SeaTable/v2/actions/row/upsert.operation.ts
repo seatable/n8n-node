@@ -22,17 +22,9 @@ function buildSelectQuery(
     rowInput: Record<string, any>,
     columnsToMatch: string[],
 ) {
-    // Columns to select - all keys in rowInput
-    const selectColumns = Object.keys(rowInput);
-    const selectClause = selectColumns.join(', ');
-
-    // WHERE clause e.g. Name=?, Name2=?
-    const whereClause = columnsToMatch.map(col => `${col}=?`).join(' AND ');
-
-    // parameters for WHERE clause in same order
-    const parameters = columnsToMatch.map(col => rowInput[col]);
-
-    const sql = `SELECT _id, ${selectClause} FROM \`${tableName}\` WHERE ${whereClause}`;
+    const whereClause = columnsToMatch.map(col => `${col}=?`).join(' AND '); // WHERE clause e.g. Name=?, Name2=?
+    const parameters = columnsToMatch.map(col => rowInput[col]); // parameters for WHERE clause in same order
+    const sql = `SELECT * FROM \`${tableName}\` WHERE ${whereClause}`;
 
     return {
         sql,
@@ -46,13 +38,9 @@ function buildUpdateQuery(
     rowInput: Record<string, any>,
     columnsToMatch: string[],
 ) {
-    // Columns for SET clause: all keys in rowInput
-    const setColumns = Object.keys(rowInput);
-    // Build SET clause like "Name=?, Name2=?, Name3=?"
-    const setClause = setColumns.map(col => `${col}=?`).join(', ');
-
-    // Build WHERE clause like "Name=?, Name2=?"
-    const whereClause = columnsToMatch.map(col => `${col}=?`).join(' AND ');
+    const setColumns = Object.keys(rowInput); // Columns for SET clause: all keys in rowInput
+    const setClause = setColumns.map(col => `${col}=?`).join(', '); // Build SET clause like "Name=?, Name2=?, Name3=?"
+    const whereClause = columnsToMatch.map(col => `${col}=?`).join(' AND '); // Build WHERE clause like "Name=?, Name2=?"
 
     // Build parameters array: first all values for SET columns,
     // then values for WHERE conditions in same order as columnsToMatch
@@ -220,6 +208,27 @@ export const properties: INodeProperties[] = [
         default: {},
     },
     {
+		displayName: 'Save to "Big Data" Backend (if new row is created)',
+		name: 'bigdata',
+		type: 'boolean',
+		default: false,
+		description:
+			'Whether write to Big Data backend (true) or not (false). True requires the activation of the Big Data backend in the base.',
+	},
+    {
+		displayName: 'Apply Column Default Values',
+		name: 'apply_default',
+		type: 'boolean',
+		default: false,
+		description:
+			'Whether to use the column default values to populate new rows during creation (only available for normal backend)',
+		displayOptions: {
+			show: {
+				bigdata: [false],
+			},
+		},
+	},
+    {
         displayName: 'Hint: Link, files, images or digital signatures have to be added separately.',
         name: 'notice',
         type: 'notice',
@@ -246,7 +255,13 @@ export async function execute(
         | 'defineBelow'
         | 'autoMapInputData';
     const columnsToMatch = this.getNodeParameter('columnsToMatch', index) as string[];
+    const bigdata = this.getNodeParameter('bigdata', index) as boolean;
+    const apply_default = this.getNodeParameter('apply_default', index, false) as boolean;
 
+    const body = {
+		table_name: tableName,
+		rows: {},
+	} as IDataObject;
     let rowInput = {} as IRowObject;
     let responseData = {} as any;
 
@@ -272,15 +287,6 @@ export async function execute(
     // string to array: multi-select and collaborators
     rowInput = splitStringColumnsToArrays(rowInput, tableColumns);
 
-    /*
-    console.log("-- my input --");
-    console.log("tableName: " + tableName);
-    console.log("fieldsToSend: " + fieldsToSend);
-    console.log("rowInput: ");
-    console.log(rowInput); // already filtered to allowed columns { Name: 'asdfasf', Name2: 'asdfweff' }
-    console.log("columnsToMatch: " + columnsToMatch); // is an array.
-    */
-
     // Validate all columnsToMatch are present in rowInput and not empty
     for (const column of columnsToMatch) {
         if (!(column in rowInput) || rowInput[column] === undefined || rowInput[column] === null || rowInput[column] === '') {
@@ -302,9 +308,10 @@ export async function execute(
         selectBody
     ) as IRowResponse;
 
+    console.log(sqlCheck);
+
     if (Array.isArray(sqlCheck.results) && sqlCheck.results.length > 0) {
         // There are elements inside -> Update
-        //console.log('Array has elements');
 
         responseData = await seaTableApiRequest.call(
             this,
@@ -316,6 +323,7 @@ export async function execute(
 
         // build the output element
         responseData.updated_rows = sqlCheck.results.length;
+        responseData.created_rows = 0;
         responseData.results = sqlCheck.results;
         responseData.results = responseData.results.map((item: any) => ({
         ...item,          // keep all existing properties like _id
@@ -323,21 +331,49 @@ export async function execute(
         }));
         delete responseData.is_join_stmt;
         delete responseData.metadata;
-        
 
     } else {
         // Empty array or not an array -> Create
-        //console.log('Array is empty or invalid');
+        // save to big data backend
+	    if (bigdata) {
+            responseData = await seaTableApiRequest.call(
+                this,
+                {},
+                'POST',
+                '/api-gateway/api/v2/dtables/{{dtable_uuid}}/sql',
+                insertBody
+            ) as IRowResponse;
 
-        console.log(insertBody);
+            responseData.updated_rows = 0;
+            responseData.created_rows = 1;
+            delete responseData.is_join_stmt;
+            delete responseData.metadata;
 
-        responseData = await seaTableApiRequest.call(
-            this,
-            {},
-            'POST',
-            '/api-gateway/api/v2/dtables/{{dtable_uuid}}/sql',
-            insertBody
-        ) as IRowResponse;
+            // FIXME: "Results ist hier leer!"
+            // Um die Zeile zu kriegen, müsste ich nochmal eine Abfrage machen.
+        }
+        // save to normal backend
+        else {
+            body.rows = [rowInput];
+            if (apply_default) {
+                body.apply_default = true;
+            }
+            const responseData = await seaTableApiRequest.call(
+                this,
+                {},
+                'POST',
+                '/api-gateway/api/v2/dtables/{{dtable_uuid}}/rows/',
+                body,
+            );
+
+            // FIXME: ganz andere art der Ausgabe. Zurückgegeben werden die Spalten-IDs und nicht Spalten-Namen.
+            // ich habe die Metadata von sql-query. Somit kann ich die Ausgabe schon umbauen...
+
+            if (responseData.first_row) {
+                return this.helpers.returnJsonArray(responseData.first_row as IDataObject[]);
+            }
+
+        }
     }
     
     return this.helpers.returnJsonArray(responseData as IDataObject[]);
