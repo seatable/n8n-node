@@ -1,5 +1,9 @@
 # Changelog
 
+## Released (2025-11-14 2.2.0)
+
+- New action: create or update a row
+
 ## Released (2025-10-06 2.1.1)
 
 - New grayscale logo for "community node" for better differentiation
