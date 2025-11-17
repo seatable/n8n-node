@@ -1,6 +1,6 @@
 # Changelog
 
-## Released (2025-11-14 2.2.0)
+## Released (2025-11-17 2.2.0)
 
 - New action: create or update a row
 
