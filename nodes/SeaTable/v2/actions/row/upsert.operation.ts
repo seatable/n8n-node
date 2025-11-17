@@ -365,7 +365,7 @@ export async function execute(
                     insertBody
                 ) as IRowResponse;
             } catch (error) {
-                throw new Error(`Row creation failed. Please verify that the Big Data backend is enabled for this base.`);
+                throw new Error(`Row creation failed. Please verify that the Big Data backend is enabled for this base or save new rows to normal backend.`);
             }
             
             responseData.updated_rows = 0;
