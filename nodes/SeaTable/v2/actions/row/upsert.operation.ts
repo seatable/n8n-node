@@ -22,7 +22,7 @@ function buildSelectQuery(
     rowInput: Record<string, any>,
     columnsToMatch: string[],
 ) {
-    const whereClause = columnsToMatch.map(col => `${col}=?`).join(' AND '); // WHERE clause e.g. Name=?, Name2=?
+    const whereClause = columnsToMatch.map(col => `\`${col}\`=?`).join(' AND '); // WHERE clause e.g. `Name`=?, `Single Select`=?
     const parameters = columnsToMatch.map(col => rowInput[col]); // parameters for WHERE clause in same order
     const sql = `SELECT * FROM \`${tableName}\` WHERE ${whereClause}`;
 
@@ -39,8 +39,8 @@ function buildUpdateQuery(
     columnsToMatch: string[],
 ) {
     const setColumns = Object.keys(rowInput); // Columns for SET clause: all keys in rowInput
-    const setClause = setColumns.map(col => `${col}=?`).join(', '); // Build SET clause like "Name=?, Name2=?, Name3=?"
-    const whereClause = columnsToMatch.map(col => `${col}=?`).join(' AND '); // Build WHERE clause like "Name=?, Name2=?"
+    const setClause = setColumns.map(col => `\`${col}\`=?`).join(', '); // Build SET clause like "Name=?, Name2=?, Name3=?"
+    const whereClause = columnsToMatch.map(col => `\`${col}\`=?`).join(' AND '); // Build WHERE clause like "Name=?, Name2=?"
 
     // Build parameters array: first all values for SET columns,
     // then values for WHERE conditions in same order as columnsToMatch
@@ -59,28 +59,47 @@ function buildUpdateQuery(
 }
 
 function buildInsertQuery(
-  tableName: string,
-  rowInput: Record<string, any>
+    tableName: string,
+    rowInput: Record<string, any>
 ) {
-  const columns = Object.keys(rowInput); // columns from rowInput keys
+    const columns = Object.keys(rowInput); // columns from rowInput keys
 
-  // Build columns part: "(col1, col2, col3)"
-  const columnsClause = `(${columns.join(', ')})`;
+    // Build columns part: "(col1, col2, col3)"
+    const columnsClause = `(${columns.map(col => `\`${col}\``).join(', ')})`;
 
-  // Build values placeholders: "(?, ?, ?)"
-  const valuesClause = `(${columns.map(() => '?').join(', ')})`;
+    // Build values placeholders: "(?, ?, ?)"
+    const valuesClause = `(${columns.map(() => '?').join(', ')})`;
 
-  // Compose full SQL query string
-  const sql = `INSERT INTO \`${tableName}\` ${columnsClause} VALUES ${valuesClause}`;
+    // Compose full SQL query string
+    const sql = `INSERT INTO \`${tableName}\` ${columnsClause} VALUES ${valuesClause}`;
 
-  // Parameters array: all values in rowInput in the order of columns
-  const parameters = columns.map(col => rowInput[col]);
+    // Parameters array: all values in rowInput in the order of columns
+    const parameters = columns.map(col => rowInput[col]);
 
-  return {
+    return {
     sql,
     parameters,
     server_only: false,
-  };
+    };
+}
+
+function renameKeys(results: any[], metadata: Array<{key: string; name: string}>) {
+    const keyToNameMap = metadata.reduce((acc, cur) => {
+    acc[cur.key] = cur.name;
+    return acc;
+    }, {} as Record<string, string>);
+
+    return results.map(item => {
+    const newItem: any = {};
+    for (const key in item) {
+        if (keyToNameMap[key]) {
+            newItem[keyToNameMap[key]] = item[key];
+        } else {
+            newItem[key] = item[key];
+        }
+    }
+    return newItem;
+    });
 }
 
 export const properties: INodeProperties[] = [
@@ -104,6 +123,7 @@ export const properties: INodeProperties[] = [
         displayName: 'Columns to Match On',
         name: 'columnsToMatch',
         type: 'multiOptions',
+        required: true,
         typeOptions: {
             loadOptionsDependsOn: ['tableName'],
             loadOptionsMethod: 'getSearchableColumns',
@@ -188,6 +208,7 @@ export const properties: INodeProperties[] = [
                             loadOptionsMethod: 'getTableUpdateAbleColumns',
                         },
                         default: '',
+                        required: true,
                     },
                     {
                         displayName: 'Column Value',
@@ -208,7 +229,8 @@ export const properties: INodeProperties[] = [
         default: {},
     },
     {
-		displayName: 'Save to "Big Data" Backend (if new row is created)',
+		// eslint-disable-next-line n8n-nodes-base/node-param-display-name-miscased
+		displayName: 'Save to "Big Data" backend (if new row is created)',
 		name: 'bigdata',
 		type: 'boolean',
 		default: false,
@@ -308,8 +330,6 @@ export async function execute(
         selectBody
     ) as IRowResponse;
 
-    console.log(sqlCheck);
-
     if (Array.isArray(sqlCheck.results) && sqlCheck.results.length > 0) {
         // There are elements inside -> Update
 
@@ -336,21 +356,32 @@ export async function execute(
         // Empty array or not an array -> Create
         // save to big data backend
 	    if (bigdata) {
-            responseData = await seaTableApiRequest.call(
-                this,
-                {},
-                'POST',
-                '/api-gateway/api/v2/dtables/{{dtable_uuid}}/sql',
-                insertBody
-            ) as IRowResponse;
-
+            try {
+                responseData = await seaTableApiRequest.call(
+                    this,
+                    {},
+                    'POST',
+                    '/api-gateway/api/v2/dtables/{{dtable_uuid}}/sql',
+                    insertBody
+                ) as IRowResponse;
+            } catch (error) {
+                throw new Error(`Row creation failed. Please verify that the Big Data backend is enabled for this base.`);
+            }
+            
             responseData.updated_rows = 0;
             responseData.created_rows = 1;
             delete responseData.is_join_stmt;
             delete responseData.metadata;
 
-            // FIXME: "Results ist hier leer!"
-            // Um die Zeile zu kriegen, müsste ich nochmal eine Abfrage machen.
+            // it is required to query again, to get the newly created row! (ugly, but a problem of SeaTable API)
+            const sqlCheck = await seaTableApiRequest.call(
+                this,
+                {},
+                'POST',
+                '/api-gateway/api/v2/dtables/{{dtable_uuid}}/sql',
+                selectBody
+            ) as IRowResponse;
+            responseData.results = sqlCheck.results;
         }
         // save to normal backend
         else {
@@ -358,21 +389,23 @@ export async function execute(
             if (apply_default) {
                 body.apply_default = true;
             }
-            const responseData = await seaTableApiRequest.call(
+            responseData = await seaTableApiRequest.call(
                 this,
                 {},
                 'POST',
                 '/api-gateway/api/v2/dtables/{{dtable_uuid}}/rows/',
                 body,
-            );
+            ) as IRowResponse;
 
-            // FIXME: ganz andere art der Ausgabe. Zurückgegeben werden die Spalten-IDs und nicht Spalten-Namen.
-            // ich habe die Metadata von sql-query. Somit kann ich die Ausgabe schon umbauen...
-
-            if (responseData.first_row) {
-                return this.helpers.returnJsonArray(responseData.first_row as IDataObject[]);
-            }
-
+            responseData.error_message = "";
+            responseData.success = true;
+            responseData.results = renameKeys([responseData.first_row], sqlCheck.metadata);
+            responseData.updated_rows = 0;
+            responseData.created_rows = responseData.inserted_row_count;
+            delete responseData.inserted_row_count;
+            delete responseData.row_ids;
+            delete responseData.first_row;
+            
         }
     }
     
