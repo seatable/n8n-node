@@ -6,10 +6,10 @@
 		"n8n-community-node-package"
 	],
 	"license": "MIT",
-	"homepage": "https://seatable.io/integrations/",
+	"homepage": "https://seatable.com/integrations/",
 	"author": {
 		"name": "Christoph Dyllick-Brenzinger",
-		"email": "cdb@seatable.io"
+		"email": "cdb@seatable.com"
 	},
 	"repository": {
 		"type": "git",

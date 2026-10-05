@@ -4,7 +4,7 @@ export class SeaTableApi implements ICredentialType {
 	name = 'seaTableApi';
 	displayName = 'SeaTable API';
 	documentationUrl =
-		'https://seatable.io/docs/n8n-integration/erstellen-eines-api-tokens-fuer-n8n/?lang=auto';
+		'https://seatable.com/help/create-api-token-for-n8n/';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Environment',
